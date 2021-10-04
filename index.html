@@ -70,7 +70,7 @@
           0.01,
           100000
         );
-        camera.position.set(0, d3.max(data, d => d.y1)* 2, 0);
+        camera.position.set(0, d3.max(data, d => d.y1) * 3, 0);
 
         // controls
 
@@ -84,8 +84,8 @@
 
         controls.screenSpacePanning = false;
 
-        controls.minDistance = -1000;
-        controls.maxDistance = d3.max(data, d => d.y1) * 2 - 1000;
+        controls.minDistance = 200;
+        controls.maxDistance = d3.max(data, d => d.y1) * 5;
         
         controls.maxPolarAngle = Math.PI / 2.5;
 
