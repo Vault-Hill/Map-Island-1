@@ -45,13 +45,17 @@
       const pointer = new THREE.Vector2();
       const tooltip = {};
 
-      d3.csv("./data.csv", d3.autoType).then((data) => {
-        init(data);
-        //render(); // remove when using next line for animation loop (requestAnimationFrame)
+      Promise.all([
+        d3.csv("./data.csv", d3.autoType),
+        d3.dsv(";", "./VHC_MAPandGreens.csv")
+      ]).then(([data, greens]) => {
+        const greenData = processGreens(greens);
+        console.log(greenData);
+        init(data, greenData);
         animate();
       });
 
-      function init(data) {
+      function init(data, greenData) {
         const [minZ, maxZ] = d3.extent(data, d => d.y1);
 
         scene = new THREE.Scene();
@@ -95,7 +99,6 @@
         // world
 
         const geometry = new THREE.BoxGeometry(32, 1, 32);
-        // const material = ;
 
         for (let i = 0; i < data.length; i++) {
           const { x1, y1, ...rest } = data[i];
@@ -117,17 +120,27 @@
           scene.add(mesh);
         }
 
+        const greens = new THREE.BufferGeometry();
+        const g_material = new THREE.LineBasicMaterial( { stroke: 0x041922 } );
+
+        const positions = greenData.flatMap(d => d.coords.flatMap(m => [m[0], 0, m[1]]));
+
+        greens.setAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
+
+        const lineSegments = new THREE.LineSegments( greens, g_material );
+        scene.add(lineSegments);
+
         // lights
 
-        const dirLight1 = new THREE.DirectionalLight(0xffffff, 0.5);
+        const dirLight1 = new THREE.DirectionalLight(0xffffff, 1);
         dirLight1.position.set(1, 1, 1);
         scene.add(dirLight1);
 
-        const dirLight2 = new THREE.DirectionalLight(0xffffff, 0.5);
+        const dirLight2 = new THREE.DirectionalLight(0xffffff, 1);
         dirLight2.position.set(-1, -1, -1);
         scene.add(dirLight2);
 
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        const ambientLight = new THREE.AmbientLight(0xffffff, 1);
         scene.add(ambientLight);
 
         // const ambientLight = new THREE.HemisphereLight(
@@ -169,27 +182,27 @@
       }
 
       function render() {
-        raycaster.setFromCamera( pointer, camera );
+        // raycaster.setFromCamera( pointer, camera );
 
-				const intersects = raycaster.intersectObjects( scene.children, false );
+				// const intersects = raycaster.intersectObjects( scene.children, false );
 
-				if ( intersects.length > 0 ) {
+				// if ( intersects.length > 0 ) {
 
-					if ( INTERSECTED != intersects[ 0 ].object ) {
+				// 	if ( INTERSECTED != intersects[ 0 ].object ) {
 
-						if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
+				// 		if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
 
-						INTERSECTED = intersects[ 0 ].object;
-						INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
-						INTERSECTED.material.emissive.setHex( 0xff0000 );
-            showTooltip();
-					}
+				// 		INTERSECTED = intersects[ 0 ].object;
+				// 		INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
+				// 		INTERSECTED.material.emissive.setHex( 0xff0000 );
+        //     showTooltip();
+				// 	}
 
-				} else {
-					if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
-					INTERSECTED = null;
-          hideTooltip();
-				}
+				// } else {
+				// 	if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
+				// 	INTERSECTED = null;
+        //   hideTooltip();
+				// }
 
         renderer.render(scene, camera);
       }
@@ -214,6 +227,37 @@
 
         t.style.left = '-350px';
         t.innerHTML = '';
+      }
+
+      function processGreens(greens) {
+        const grouped = d3.group(greens, d => d.Name);
+
+        const columns = greens.columns.slice(2);
+        
+        return greens.map(d => {
+          const coords = columns.filter(x => d[x]).map(x => {
+            return d[x].split(",").map(x => +x);
+          });
+          const all_coords = [];
+          for (let i = 1; i < coords.length; i++) {
+            all_coords.push(
+              coords[i],
+              coords[i - 1],
+            )
+
+            if (i === coords.length - 1) {
+              all_coords.push(
+                coords[i],
+                coords[0],
+              )
+            }
+          }
+
+          return {
+            Name: d.Name,
+            coords: all_coords,
+          }
+        });
       }
     </script>
   </body>
