@@ -52,6 +52,8 @@
       });
 
       function init(data) {
+        const [minZ, maxZ] = d3.extent(data, d => d.y1);
+
         scene = new THREE.Scene();
         scene.background = new THREE.Color(0x122230);
         // scene.fog = new THREE.FogExp2(0x0f1d29, 0.002);
@@ -65,12 +67,13 @@
         document.addEventListener( 'mousemove', onPointerMove );
 
         camera = new THREE.PerspectiveCamera(
-          45,
+          60,
           window.innerWidth / window.innerHeight,
           0.01,
-          100000
+          100000,
         );
-        camera.position.set(0, d3.max(data, d => d.y1) * 3, 0);
+
+        camera.position.set(0, maxZ * 2, 0);
 
         // controls
 
@@ -84,8 +87,8 @@
 
         controls.screenSpacePanning = false;
 
-        controls.minDistance = 200;
-        controls.maxDistance = d3.max(data, d => d.y1) * 5;
+        controls.minDistance = 100;
+        controls.maxDistance = maxZ * 5;
         
         controls.maxPolarAngle = Math.PI / 2.5;
 
@@ -116,27 +119,27 @@
 
         // lights
 
-        // const dirLight1 = new THREE.DirectionalLight(0xffffff);
-        // dirLight1.position.set(1, 1, 1);
-        // scene.add(dirLight1);
+        const dirLight1 = new THREE.DirectionalLight(0xffffff, 0.5);
+        dirLight1.position.set(1, 1, 1);
+        scene.add(dirLight1);
 
-        // const dirLight2 = new THREE.DirectionalLight(0x002288);
-        // dirLight2.position.set(-1, -1, -1);
-        // scene.add(dirLight2);
+        const dirLight2 = new THREE.DirectionalLight(0xffffff, 0.5);
+        dirLight2.position.set(-1, -1, -1);
+        scene.add(dirLight2);
 
-        // const ambientLight = new THREE.AmbientLight(0x222222);
-        // scene.add(ambientLight);
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(ambientLight);
 
-        const ambientLight = new THREE.HemisphereLight(
-          0xddeeff, // sky color
-          0x202020, // ground color
-          0.5, // intensity
-        );
+        // const ambientLight = new THREE.HemisphereLight(
+        //   0x122230, // sky color
+        //   0x122230, // ground color
+        //   1, // intensity
+        // );
 
-        const mainLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
-        mainLight.position.set( 10, 10, 10 ).normalize();
+        // const mainLight = new THREE.DirectionalLight( 0xffffff, 1 );
+        // mainLight.position.set( 10, 10, 10 )
 
-        scene.add( ambientLight, mainLight );
+        // scene.add( ambientLight, mainLight );
 
         //
 
