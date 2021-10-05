@@ -76,10 +76,39 @@
         d3.csv("./data.csv", d3.autoType),
         d3.dsv(";", "./VHC_MAPandGreens.csv"),
         d3.dsv(";", "./VHC_MAPandstreets.csv"),
-      ]).then(([data, greens, streets]) => {
+        d3.dsv(";", "./VHC_MAPandHills.csv"),
+        d3.dsv(";", "./VHC_MAPandCommonSpaces.csv"),
+      ]).then(([data, greens, streets, hills, commonSpaces]) => {
         const greenData = processGreens(greens);
         const streetsData = processStreets(streets);
-        init(data, greenData, streetsData);
+
+        const hillsData = hills.map(d => {
+          return {
+            Name: d.Name,
+            orig_coords: [
+              d.HILLS_1_XY.split(",").map(d => +d),
+              d.HILLS_2_XY.split(",").map(d => +d),
+              d.HILLS_3_XY.split(",").map(d => +d),
+            ]
+          }
+        });
+
+        const common = commonSpaces.map(d => {
+          return {
+            Name: d.Name,
+            orig_coords: [
+              d.COMMONSPACE_1_XY.split(",").map(d => +d),
+              d.COMMONSPACE_2_XY.split(",").map(d => +d),
+              d.COMMONSPACE_3_XY.split(",").map(d => +d),
+              d.COMMONSPACE_4_XY.split(",").map(d => +d),
+              // d.COMMONSPACE_5_XY.split(",").map(d => +d),
+              d.COMMONSPACE_6_XY.split(",").map(d => +d),
+              d.COMMONSPACE_7_XY.split(",").map(d => +d),
+            ]
+          }
+        }); 
+
+        init(data, [...greenData, ...hillsData, ...common], streetsData);
         animate();
       });
 
