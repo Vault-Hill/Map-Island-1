@@ -10,10 +10,10 @@
 
     <style>
       body {
-        background-color: #ccc;
-        color: #000;
+        background-color: #122230;
         padding: 0;
         margin: 0;
+        min-height: 100vh;
       }
 
       #scene {
@@ -37,29 +37,57 @@
     <div id="tooltip"></div>
     <script src="./d3.v7.min.js"></script>
     <script type="module">
+      // WATER 122230
+      // GREEN 041922
+      // GROUND 0a0f1d
+      // STREETS AND BRIDGES 32495c
+      // EXLUSIVE c1e5e6
+      // DELUXE 75bac1
+      // PREMIUM 4aa6af
+      // STANDARD 00929c
+
+      const colors = {
+        Water: 0x122230,
+        Green: 0x041922,
+        Ground: 0x0a0f1d,
+        Streets: 0x32495c,
+        Exclusive: 0xc1e5e6,
+        Deluxe: 0x75bac1,
+        Premium: 0x4aa6af,
+        Standard: 0x00929c,
+      };
+
+      const sizes = {
+        Exclusive: 48,
+        Deluxe: 32,
+        Premium: 16,
+        Standard: 8,
+      };
+
       import * as THREE from "./three.module.js";
 
       import { OrbitControls } from "./OrbitControls.js";
 
-      let camera, controls, scene, renderer, raycaster, INTERSECTED;
+      let camera, controls, scene, renderer, raycaster, INTERSECTED, lands;
       const pointer = new THREE.Vector2();
       const tooltip = {};
 
       Promise.all([
         d3.csv("./data.csv", d3.autoType),
-        d3.dsv(";", "./VHC_MAPandGreens.csv")
-      ]).then(([data, greens]) => {
+        d3.dsv(";", "./VHC_MAPandGreens.csv"),
+        d3.dsv(";", "./VHC_MAPandstreets.csv"),
+      ]).then(([data, greens, streets]) => {
         const greenData = processGreens(greens);
-        console.log(greenData);
-        init(data, greenData);
+        const streetsData = processStreets(streets);
+        init(data, greenData, streetsData);
         animate();
       });
 
-      function init(data, greenData) {
-        const [minZ, maxZ] = d3.extent(data, d => d.y1);
+      function init(data, greenData, streetsData) {
+        const [minZ, maxZ] = d3.extent(data, (d) => d.y1);
 
         scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x122230);
+        scene.background = new THREE.Color(colors.Water);
         // scene.fog = new THREE.FogExp2(0x0f1d29, 0.002);
 
         raycaster = new THREE.Raycaster();
@@ -67,14 +95,14 @@
         renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setPixelRatio(window.devicePixelRatio);
         renderer.setSize(window.innerWidth, window.innerHeight);
-        document.getElementById('scene').appendChild(renderer.domElement);
-        document.addEventListener( 'mousemove', onPointerMove );
+        document.getElementById("scene").appendChild(renderer.domElement);
+        document.addEventListener("mousemove", onPointerMove);
 
         camera = new THREE.PerspectiveCamera(
           60,
           window.innerWidth / window.innerHeight,
           0.01,
-          100000,
+          100000
         );
 
         camera.position.set(0, maxZ * 2, 0);
@@ -93,21 +121,54 @@
 
         controls.minDistance = 100;
         controls.maxDistance = maxZ * 5;
-        
+
         controls.maxPolarAngle = Math.PI / 2.5;
 
         // world
 
-        const geometry = new THREE.BoxGeometry(32, 1, 32);
+        const greeSpace = new THREE.Group();
+
+        greenData.forEach((d) => {
+          const land = createPolygon(d.orig_coords);
+          land.rotateX(Math.PI / 2);
+          greeSpace.add(land);
+        });
+
+        scene.add(greeSpace);
+
+        const streets = new THREE.Group();
+
+        streetsData.forEach((d) => {
+          const m = createPolygon(d.orig_coords, {color: colors.Streets});
+          m.rotateX(Math.PI / 2);
+          streets.add(m);
+        });
+
+        // scene.add(streets);
+
+        // const geometry = new THREE.BoxGeometry(32, 1, 32);
+
+        const geometries = {
+          Exclusive: new THREE.BoxGeometry(32, sizes.Exclusive, 32),
+          Deluxe: new THREE.BoxGeometry(32, sizes.Deluxe, 32),
+          Premium: new THREE.BoxGeometry(32, sizes.Premium, 32),
+          Standard: new THREE.BoxGeometry(32, sizes.Standard, 32),
+        }
+
+
+        lands = new THREE.Group();
 
         for (let i = 0; i < data.length; i++) {
           const { x1, y1, ...rest } = data[i];
+          const type = rest.Name.split("_")[0];
+          const geometry = geometries[type];
+          const mat = new THREE.MeshStandardMaterial({
+            color: colors[type],
+            flatShading: true,
+            side: THREE.DoubleSide,
+          });
 
-          const mesh = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({
-          color: 0x00929c,
-          flatShading: true,
-          side: THREE.DoubleSide
-        }));
+          const mesh = new THREE.Mesh(geometry, mat);
 
           mesh.userData = rest;
           mesh.position.x = x1;
@@ -116,28 +177,20 @@
 
           mesh.updateMatrix();
           mesh.matrixAutoUpdate = false;
-          
-          scene.add(mesh);
+
+          lands.add(mesh);
         }
 
-        const greens = new THREE.BufferGeometry();
-        const g_material = new THREE.LineBasicMaterial( { stroke: 0x041922 } );
-
-        const positions = greenData.flatMap(d => d.coords.flatMap(m => [m[0], 0, m[1]]));
-
-        greens.setAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
-
-        const lineSegments = new THREE.LineSegments( greens, g_material );
-        scene.add(lineSegments);
+        scene.add(lands);
 
         // lights
 
         const dirLight1 = new THREE.DirectionalLight(0xffffff, 1);
-        dirLight1.position.set(1, 1, 1);
+        dirLight1.position.set(-10, -10, -10);
         scene.add(dirLight1);
 
         const dirLight2 = new THREE.DirectionalLight(0xffffff, 1);
-        dirLight2.position.set(-1, -1, -1);
+        dirLight2.position.set(10, 10, 10);
         scene.add(dirLight2);
 
         const ambientLight = new THREE.AmbientLight(0xffffff, 1);
@@ -149,6 +202,8 @@
         //   1, // intensity
         // );
 
+        // scene.add(ambientLight);
+
         // const mainLight = new THREE.DirectionalLight( 0xffffff, 1 );
         // mainLight.position.set( 10, 10, 10 )
 
@@ -159,9 +214,36 @@
         window.addEventListener("resize", onWindowResize);
       }
 
-      function onPointerMove( event ) {
-        pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-        pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+      function createPolygon(poly, opts) {
+        var shape = new THREE.Shape();
+
+        shape.moveTo(poly[0][0], poly[0][1]);
+
+        for (var i = 1; i < poly.length; ++i) {
+          shape.lineTo(poly[i][0], poly[i][1]);
+        }
+
+        shape.lineTo(poly[0][0], poly[0][1]);
+
+        var geometry = new THREE.ShapeGeometry(shape);
+        var material = new THREE.MeshBasicMaterial({
+          color: colors.Green,
+          side: THREE.DoubleSide,
+          depthWrite: false,
+          side: THREE.DoubleSide,
+          polygonOffset: true,
+          polygonOffsetFactor: -4,
+          polygonOffsetUnits: 1,
+          ...(opts || {})
+        });
+        const m = new THREE.Mesh(geometry, material);
+        m.renderDepth = 0;
+        return m;
+      }
+
+      function onPointerMove(event) {
+        pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
+        pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
         tooltip.x = event.clientX;
         tooltip.y = event.clientY;
       }
@@ -182,27 +264,26 @@
       }
 
       function render() {
-        // raycaster.setFromCamera( pointer, camera );
+        raycaster.setFromCamera(pointer, camera);
 
-				// const intersects = raycaster.intersectObjects( scene.children, false );
+        const intersects = raycaster.intersectObjects(lands.children, false);
 
-				// if ( intersects.length > 0 ) {
+        if (intersects.length > 0) {
+          if (INTERSECTED != intersects[0].object) {
+            if (INTERSECTED)
+              INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
 
-				// 	if ( INTERSECTED != intersects[ 0 ].object ) {
-
-				// 		if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
-
-				// 		INTERSECTED = intersects[ 0 ].object;
-				// 		INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
-				// 		INTERSECTED.material.emissive.setHex( 0xff0000 );
-        //     showTooltip();
-				// 	}
-
-				// } else {
-				// 	if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
-				// 	INTERSECTED = null;
-        //   hideTooltip();
-				// }
+            INTERSECTED = intersects[0].object;
+            INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
+            INTERSECTED.material.emissive.setHex(0xff0000);
+            showTooltip();
+          }
+        } else {
+          if (INTERSECTED)
+            INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
+          INTERSECTED = null;
+          hideTooltip();
+        }
 
         renderer.render(scene, camera);
       }
@@ -210,11 +291,11 @@
       function showTooltip() {
         if (!INTERSECTED) return hideTooltip();
 
-        const t = document.getElementById('tooltip');
+        const t = document.getElementById("tooltip");
         const datum = INTERSECTED.userData;
 
-        t.style.left = (tooltip.x + 5) + 'px';
-        t.style.top = (tooltip.y + 5) + 'px';
+        t.style.left = tooltip.x + 5 + "px";
+        t.style.top = tooltip.y + 5 + "px";
 
         t.innerHTML = `
           <div style="margin-bottom: 10px">ID: ${datum.ID}</div>
@@ -223,40 +304,49 @@
       }
 
       function hideTooltip() {
-        const t = document.getElementById('tooltip');
+        const t = document.getElementById("tooltip");
 
-        t.style.left = '-350px';
-        t.innerHTML = '';
+        t.style.left = "-350px";
+        t.innerHTML = "";
       }
 
-      function processGreens(greens) {
-        const grouped = d3.group(greens, d => d.Name);
+      function processStreets(input) {
+        const grouped = d3.group(input, (d) => d.Name);
 
-        const columns = greens.columns.slice(2);
-        
-        return greens.map(d => {
-          const coords = columns.filter(x => d[x]).map(x => {
-            return d[x].split(",").map(x => +x);
-          });
-          const all_coords = [];
-          for (let i = 1; i < coords.length; i++) {
-            all_coords.push(
-              coords[i],
-              coords[i - 1],
-            )
+        const columns = input.columns.slice(4);
 
-            if (i === coords.length - 1) {
-              all_coords.push(
-                coords[i],
-                coords[0],
-              )
-            }
-          }
+        return input.map((d) => {
+          const coords = columns
+            .filter((x) => d[x])
+            .map((x) => {
+              return d[x].split(",").map((x) => +x);
+            });
 
           return {
             Name: d.Name,
-            coords: all_coords,
-          }
+            // coords: all_coords,
+            orig_coords: coords,
+          };
+        });
+      }
+
+      function processGreens(greens) {
+        const grouped = d3.group(greens, (d) => d.Name);
+
+        const columns = greens.columns.slice(2);
+
+        return greens.map((d) => {
+          const coords = columns
+            .filter((x) => d[x])
+            .map((x) => {
+              return d[x].split(",").map((x) => +x);
+            });
+
+          return {
+            Name: d.Name,
+            // coords: all_coords,
+            orig_coords: coords,
+          };
         });
       }
     </script>
