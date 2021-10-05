@@ -144,7 +144,7 @@
           streets.add(m);
         });
 
-        // scene.add(streets);
+        scene.add(streets);
 
         // const geometry = new THREE.BoxGeometry(32, 1, 32);
 
@@ -298,7 +298,7 @@
       function processStreets(input) {
         const grouped = d3.group(input, (d) => d.Name);
 
-        const columns = input.columns.slice(4);
+        const columns = input.columns.slice(2);
 
         return input.map((d) => {
           const coords = columns
