@@ -7,9 +7,10 @@ Promise.all([
   d3.dsv(";", "./data/VHC_MAPandstreets.csv"),
   d3.dsv(";", "./data/VHC_MAPandHills.csv"),
   d3.dsv(";", "./data/VHC_MAPandCommonSpaces.csv"),
-]).then(([data, greens, streets, hills, commonSpaces]) => {
-  const greenData = processGreens(greens);
-  const streetsData = processStreets(streets);
+  d3.dsv(";", "./data/VHC_MAPandDiagonalsParallels-3.csv"),
+]).then(([data, greens, streets, hills, commonSpaces, bridges]) => {
+  const greenData = processCoords(greens);
+  const streetsData = processCoords(streets);
 
   const hillsData = hills.map((d) => {
     return {
@@ -37,35 +38,21 @@ Promise.all([
     };
   });
 
+  const bridgesData = processCoords(bridges);
+
   const vaultHill = VaultHill({
     data: {
       lands: data,
       greenAreas: [...greenData, ...hillsData],
       commonSpaces: common,
       streets: streetsData,
+      bridges: bridgesData,
     }
   });
 });
 
-function processStreets(input) {
-  const columns = input.columns.slice(2);
-
-  return input.map((d) => {
-    const coords = columns
-      .filter((x) => d[x])
-      .map((x) => {
-        return d[x].split(",").map((x) => +x);
-      });
-
-    return {
-      Name: d.Name,
-      coords,
-    };
-  });
-}
-
-function processGreens(greens) {
-  const columns = greens.columns.slice(2);
+function processCoords(greens, index = 2) {
+  const columns = greens.columns.slice(index);
 
   return greens.map((d) => {
     const coords = columns

@@ -1,11 +1,13 @@
 import * as THREE from "../libs/three.module.js";
 import { OrbitControls } from "../libs/OrbitControls.js";
+import {LineGeometry, LineMaterial, Line2} from "../libs/three-fatline.module.js";
 
 const colors = {
   Water: 0x122230,
   Green: 0x041922,
   Ground: 0x0a0f1d,
   Streets: 0x32495c,
+  Bridges: 0x103665,
   Exclusive: 0xc1e5e6,
   Deluxe: 0x75bac1,
   Premium: 0x4aa6af,
@@ -129,7 +131,7 @@ function VaultHill({ data = {}, container = "#scene" }) {
     data.commonSpaces.forEach((d) => {
       const p = createPolygon(d.coords);
 
-      const land = new THREE.Mesh(p, materials.greenAreas);
+      const land = new THREE.Mesh(p, materials.greenLands);
       land.renderDepth = 0;
       land.rotateX(Math.PI / 2);
 
@@ -158,10 +160,56 @@ function VaultHill({ data = {}, container = "#scene" }) {
       polygonOffsetUnits: 1,
     });
 
+    const matLine = new LineMaterial({
+      color: colors.Bridges,
+      flatShading: true,
+      linewidth: 2, // px
+      worldUnits: true,
+      depthWrite: false,
+      alphaToCoverage: true,
+      needsUpdate: true,
+      polygonOffset: true,
+      polygonOffsetFactor: -1,
+      polygonOffsetUnits: 1,
+      resolution: new THREE.Vector2(width, height), // resolution of the viewport
+      dashed: false,
+      alphaToCoverage: true,
+      // dashed, dashScale, dashSize, gapSize
+    });
+
     return {
       greenLands,
       streets,
+      matLine,
     };
+  }
+
+  function createLine(pos) {
+    const geometry = new LineGeometry();
+    geometry.setPositions(pos);
+    const line = new Line2(geometry, materials.matLine);
+    line.computeLineDistances();
+    line.scale.set( 1, 1, 1 );
+    scene.add( line );
+  }
+
+  function createBridges() {
+
+    const y = -1;
+
+    data.bridges
+      .forEach(({ Name, coords }) => {
+        const isParralel = Name.includes("Parallels");
+
+        const positions = coords.flatMap(d => [d[0], y, d[1]]);
+
+        if (!isParralel) {
+          positions.push(coords[0][0], y, coords[0][1]);
+        }
+
+        createLine(positions)
+      });
+
   }
 
   function createObjects() {
@@ -171,6 +219,7 @@ function VaultHill({ data = {}, container = "#scene" }) {
     createStreets();
     createCommonSpaces();
     createLands();
+    createBridges();
   }
 
   function createControls() {
@@ -200,8 +249,10 @@ function VaultHill({ data = {}, container = "#scene" }) {
 
   function createRenderer() {
     renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setClearColor( 0x000000, 0.0 );
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(width, height);
+    renderer.clearDepth(); // important!
 
     document.querySelector(container).appendChild(renderer.domElement);
     document.body.addEventListener("mousemove", onPointerMove);
@@ -281,6 +332,9 @@ function VaultHill({ data = {}, container = "#scene" }) {
   }
 
   function onWindowResize() {
+    width = window.innerWidth;
+    height = window.innerHeight;
+
     camera.aspect = width / height;
 
     camera.updateProjectionMatrix();
