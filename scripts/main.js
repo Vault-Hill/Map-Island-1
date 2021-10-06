@@ -7,7 +7,7 @@ Promise.all([
   d3.dsv(";", "./data/VHC_MAPandstreets.csv"),
   d3.dsv(";", "./data/VHC_MAPandHills.csv"),
   d3.dsv(";", "./data/VHC_MAPandCommonSpaces.csv"),
-  d3.dsv(";", "./data/VHC_MAPandDiagonalsParallels-3.csv"),
+  d3.dsv(";", "./data/VHC_MAPandDiagonalsParallels.csv"),
   d3.dsv(";", "./data/VHC_MAPandLakes.csv"),
 ]).then(([data, greens, streets, hills, commonSpaces, bridges, lakes]) => {
   const greenData = processCoords(greens);
