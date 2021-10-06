@@ -1,0 +1,20 @@
+body {
+  background-color: #122230;
+  padding: 0;
+  margin: 0;
+  min-height: 100vh;
+}
+
+#scene {
+  width: 100vw;
+  height: 100vh;
+}
+
+#tooltip {
+  position: absolute;
+  top: 0px;
+  left: -350px;
+  background-color: #fff;
+  padding: 15px;
+  border-radius: 5px;
+}
