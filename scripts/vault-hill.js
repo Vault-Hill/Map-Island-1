@@ -6,7 +6,7 @@ const colors = {
   Water: 0x122230,
   Green: 0x041922,
   Ground: 0x0a0f1d,
-  Streets: 0x161b2a,
+  Streets: 0x32495c,
   Bridges: 0x103665,
   Exclusive: 0xc1e5e6,
   Deluxe: 0x75bac1,
