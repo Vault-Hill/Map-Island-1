@@ -141,6 +141,22 @@ function VaultHill({ data = {}, container = "#scene" }) {
     scene.add(greens);
   }
 
+  function createLakes() {
+    const lakes = new THREE.Group();
+
+    data.lakes.forEach((d) => {
+      const p = createPolygon(d.coords);
+
+      const land = new THREE.Mesh(p, materials.lakes);
+      land.renderDepth = 0;
+      land.rotateX(Math.PI / 2);
+
+      lakes.add(land);
+    });
+
+    scene.add(lakes);
+  }
+
   function createMaterials() {
     const greenLands = new THREE.MeshBasicMaterial({
       color: colors.Green,
@@ -157,6 +173,15 @@ function VaultHill({ data = {}, container = "#scene" }) {
       side: THREE.DoubleSide,
       polygonOffset: true,
       polygonOffsetFactor: -4,
+      polygonOffsetUnits: 1,
+    });
+
+    const lakes = new THREE.MeshBasicMaterial({
+      color: colors.Water,
+      depthWrite: false,
+      side: THREE.DoubleSide,
+      polygonOffset: true,
+      polygonOffsetFactor: -2,
       polygonOffsetUnits: 1,
     });
 
@@ -181,6 +206,7 @@ function VaultHill({ data = {}, container = "#scene" }) {
       greenLands,
       streets,
       matLine,
+      lakes
     };
   }
 
@@ -220,6 +246,7 @@ function VaultHill({ data = {}, container = "#scene" }) {
     createCommonSpaces();
     createLands();
     createBridges();
+    createLakes();
   }
 
   function createControls() {

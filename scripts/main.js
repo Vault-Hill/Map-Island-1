@@ -1,5 +1,5 @@
 import * as d3 from "https://cdn.skypack.dev/d3@7";
-import VaultHill from './vault-hill.js';
+import VaultHill from "./vault-hill.js";
 
 Promise.all([
   d3.csv("./data/data.csv", d3.autoType),
@@ -8,9 +8,11 @@ Promise.all([
   d3.dsv(";", "./data/VHC_MAPandHills.csv"),
   d3.dsv(";", "./data/VHC_MAPandCommonSpaces.csv"),
   d3.dsv(";", "./data/VHC_MAPandDiagonalsParallels-3.csv"),
-]).then(([data, greens, streets, hills, commonSpaces, bridges]) => {
+  d3.dsv(";", "./data/VHC_MAPandLakes.csv"),
+]).then(([data, greens, streets, hills, commonSpaces, bridges, lakes]) => {
   const greenData = processCoords(greens);
   const streetsData = processCoords(streets);
+  const lakesData = processCoords(lakes);
 
   const hillsData = hills.map((d) => {
     return {
@@ -47,7 +49,8 @@ Promise.all([
       commonSpaces: common,
       streets: streetsData,
       bridges: bridgesData,
-    }
+      lakes: lakesData,
+    },
   });
 });
 
