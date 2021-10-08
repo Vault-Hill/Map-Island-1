@@ -1,9 +1,12 @@
 import * as d3 from "https://cdn.skypack.dev/d3@7";
 import VaultHill from "./vault-hill.js";
 
+const scaleFactor = 1000;
+
 let sidebarShown = false, vaultHill, threeD = false;
 
 d3.select('#toggler').on('click', toggleSidebar);
+d3.select('#texture_selector').on('change', changeTexture)
 // d3.select('#threeDBtn').on('click', toggleThreeD);
 
 Promise.all([
@@ -23,9 +26,9 @@ Promise.all([
     return {
       Name: d.Name,
       coords: [
-        d.HILLS_1_XY.split(",").map((d) => +d),
-        d.HILLS_2_XY.split(",").map((d) => +d),
-        d.HILLS_3_XY.split(",").map((d) => +d),
+        d.HILLS_1_XY.split(",").map((d) => +d / scaleFactor),
+        d.HILLS_2_XY.split(",").map((d) => +d / scaleFactor),
+        d.HILLS_3_XY.split(",").map((d) => +d / scaleFactor),
       ],
     };
   });
@@ -34,13 +37,13 @@ Promise.all([
     return {
       Name: d.Name,
       coords: [
-        d.COMMONSPACE_1_XY.split(",").map((d) => +d),
-        d.COMMONSPACE_2_XY.split(",").map((d) => +d),
-        d.COMMONSPACE_3_XY.split(",").map((d) => +d),
-        d.COMMONSPACE_4_XY.split(",").map((d) => +d),
+        d.COMMONSPACE_1_XY.split(",").map((d) => +d / scaleFactor),
+        d.COMMONSPACE_2_XY.split(",").map((d) => +d / scaleFactor),
+        d.COMMONSPACE_3_XY.split(",").map((d) => +d / scaleFactor),
+        d.COMMONSPACE_4_XY.split(",").map((d) => +d / scaleFactor),
         // d.COMMONSPACE_5_XY.split(",").map(d => +d),
-        d.COMMONSPACE_6_XY.split(",").map((d) => +d),
-        d.COMMONSPACE_7_XY.split(",").map((d) => +d),
+        d.COMMONSPACE_6_XY.split(",").map((d) => +d / scaleFactor),
+        d.COMMONSPACE_7_XY.split(",").map((d) => +d / scaleFactor),
       ],
     };
   });
@@ -49,7 +52,13 @@ Promise.all([
 
   vaultHill = VaultHill({
     data: {
-      lands: data,
+      lands: data.map(d => {
+        return {
+          ...d,
+          x1: d.x1 / scaleFactor,
+          y1: d.y1 / scaleFactor,
+        }
+      }),
       greenAreas: [...greenData, ...hillsData],
       commonSpaces: common,
       streets: streetsData,
@@ -57,20 +66,39 @@ Promise.all([
       lakes: lakesData,
     },
     container: "#scene",
+    material: 'ocean',
     onLandClick: (land) => {
       const el = d3.select('#land_info');
 
       if (land) {
         el.html(`
-          <div style="margin-bottom: 10px">ID: ${land.ID}</div>
-          <div>NAME: ${land.Name}</div>
+          <div style="margin-bottom: 10px">
+            <label>ID:</label> 
+            <div>${land.ID}</div>
+          </div>
+          <div>
+            <label>
+              NAME:
+            </label>
+            <div>
+              ${land.Name}
+            </div>
+          </div>
         `)
+        if (!sidebarShown) {
+          toggleSidebar();
+        }
       } else {
         el.html('');
       }
     }
   });
 });
+
+function changeTexture() {
+  const val = this.value;
+  vaultHill.updateMaterial(val);
+}
 
 function processCoords(greens, index = 2) {
   const columns = greens.columns.slice(index);
@@ -79,7 +107,7 @@ function processCoords(greens, index = 2) {
     const coords = columns
       .filter((x) => d[x])
       .map((x) => {
-        return d[x].split(",").map((x) => +x);
+        return d[x].split(",").map((x) => +x / scaleFactor);
       });
 
     return {

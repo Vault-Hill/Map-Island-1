@@ -7,6 +7,7 @@ body {
   padding: 0;
   margin: 0;
   min-height: 100vh;
+  font-family: 'Roboto', sans-serif;
 }
 
 #scene {
@@ -46,12 +47,11 @@ body {
   top: 20px;
   -webkit-box-align: center;
   align-items: center;
-  box-shadow: rgb(0 0 0 / 20%) 0px 1px 3px;
   -webkit-box-pack: center;
   justify-content: center;
-  background-color: rgb(106, 116, 133);
+  background-color: #ccc;
   border-radius: 1px;
-  color: rgb(41, 50, 60);
+  color: #fff;
   display: flex;
   height: 20px;
   width: 20px;
@@ -66,4 +66,21 @@ body {
 .sidebar__close.sidebar__hidden {
   left: 20px !important;
   transform: rotate(180deg);
+}
+
+.space-below {
+  margin-bottom: 15px;
+}
+
+select {
+  color: #fff;
+  background-color: #5E738B;
+  padding: 8px 0px 8px 8px;
+  width: 100%;
+}
+
+label {
+  margin-bottom: 8px;
+  display: inline-block;
+  color: #5E738B;
 }
