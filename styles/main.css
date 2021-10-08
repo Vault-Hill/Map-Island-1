@@ -60,7 +60,7 @@ body {
 }
 
 .sidebar.sidebar__hidden {
-  left: -300px;
+  left: -300px !important;
 }
 
 .sidebar__close.sidebar__hidden {

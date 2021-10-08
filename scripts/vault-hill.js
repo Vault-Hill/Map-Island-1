@@ -5,6 +5,8 @@ import {
   LineMaterial,
   Line2,
 } from "../libs/three-fatline.module.js";
+import {Sky} from '../libs/Sky.js';
+import {Water} from '../libs/Water.js';
 
 const colors = {
   Water: 0x122230,
@@ -40,7 +42,9 @@ function VaultHill({
     height = window.innerHeight,
     width = window.innerWidth,
     lands,
-    materials;
+    materials,
+    sun,
+    water;
 
   const pointer = new THREE.Vector2();
   const tooltip = {};
@@ -251,12 +255,75 @@ function VaultHill({
   function createObjects() {
     materials = createMaterials();
 
-    createGreenAreas();
-    createStreets();
-    createCommonSpaces();
-    createLands();
-    createBridges();
-    createLakes();
+    createWater();
+    // createGreenAreas();
+    // createStreets();
+    // createCommonSpaces();
+    // createLands();
+    // createBridges();
+    // createLakes();
+  }
+
+  function createWater() {
+    sun = new THREE.Vector3();
+
+    // Water
+
+    const waterGeometry = new THREE.PlaneGeometry(100000, 100000);
+
+    water = new Water(waterGeometry, {
+      textureWidth: 512,
+      textureHeight: 512,
+      waterNormals: new THREE.TextureLoader().load(
+        "images/textures/waternormals.jpeg",
+        function (texture) {
+          texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+        }
+      ),
+      sunDirection: new THREE.Vector3(),
+      sunColor: 0xffffff,
+      waterColor: 0x001e0f,
+      distortionScale: 3.7,
+      fog: scene.fog !== undefined,
+    });
+
+    water.rotation.x = -Math.PI / 2;
+
+    scene.add(water);
+
+    // Skybox
+
+    const sky = new Sky();
+    sky.scale.setScalar(200000);
+    scene.add(sky);
+
+    const skyUniforms = sky.material.uniforms;
+
+    skyUniforms["turbidity"].value = 10;
+    skyUniforms["rayleigh"].value = 2;
+    skyUniforms["mieCoefficient"].value = 0.005;
+    skyUniforms["mieDirectionalG"].value = 0.8;
+
+    const parameters = {
+      elevation: 2,
+      azimuth: 180,
+    };
+
+    const pmremGenerator = new THREE.PMREMGenerator(renderer);
+
+    function updateSun() {
+      const phi = THREE.MathUtils.degToRad(90 - parameters.elevation);
+      const theta = THREE.MathUtils.degToRad(parameters.azimuth);
+
+      sun.setFromSphericalCoords(1, phi, theta);
+
+      sky.material.uniforms["sunPosition"].value.copy(sun);
+      water.material.uniforms["sunDirection"].value.copy(sun).normalize();
+
+      scene.environment = pmremGenerator.fromScene(sky).texture;
+    }
+
+    updateSun();
   }
 
   function createControls() {
@@ -275,17 +342,21 @@ function VaultHill({
   }
 
   function createCamera() {
-    const fov = 60; // Field of View. In DEGREES [1, 179]
+    const fov = 55; // Field of View. In DEGREES [1, 179]
     const aspect = width / height;
-    const near = 0.01; // the near clipping plane
-    const far = 100000; // the far clipping plane
+    const near = 1; // the near clipping plane
+    const far = 20000; // the far clipping plane
 
     camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-    camera.position.set(0, maxZ * 2, 0);
+    camera.position.set(30, 30, 100);
+
+    // camera = new THREE.PerspectiveCamera( 55, window.innerWidth / window.innerHeight, 1, 20000 );
+    // camera.position.set( 30, 30, 100 );
   }
 
   function createRenderer() {
     renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.setClearColor(0x000000, 0.0);
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(width, height);
@@ -299,7 +370,7 @@ function VaultHill({
       if (INTERSECTED) {
         onLandClick(INTERSECTED.userData);
       } else {
-        onLandClick(null)
+        onLandClick(null);
       }
     });
 
@@ -331,28 +402,32 @@ function VaultHill({
   }
 
   function render() {
-    raycaster.setFromCamera(pointer, camera);
+    // raycaster.setFromCamera(pointer, camera);
 
-    const intersects = raycaster.intersectObjects(lands.children, false);
+    // const intersects = raycaster.intersectObjects(lands.children, false);
 
-    if (intersects.length > 0) {
-      if (INTERSECTED != intersects[0].object) {
-        if (INTERSECTED) {
-          INTERSECTED.material.color.setHex(INTERSECTED.currentHex);
-        }
+    // if (intersects.length > 0) {
+    //   if (INTERSECTED != intersects[0].object) {
+    //     if (INTERSECTED) {
+    //       INTERSECTED.material.color.setHex(INTERSECTED.currentHex);
+    //     }
 
-        INTERSECTED = intersects[0].object;
-        INTERSECTED.currentHex = INTERSECTED.material.color.getHex();
-        INTERSECTED.material.color.setHex(colors.Highlight);
-        showTooltip();
-      }
-    } else {
-      if (INTERSECTED) {
-        INTERSECTED.material.color.setHex(INTERSECTED.currentHex);
-      }
+    //     INTERSECTED = intersects[0].object;
+    //     INTERSECTED.currentHex = INTERSECTED.material.color.getHex();
+    //     INTERSECTED.material.color.setHex(colors.Highlight);
+    //     showTooltip();
+    //   }
+    // } else {
+    //   if (INTERSECTED) {
+    //     INTERSECTED.material.color.setHex(INTERSECTED.currentHex);
+    //   }
 
-      INTERSECTED = null;
-      hideTooltip();
+    //   INTERSECTED = null;
+    //   hideTooltip();
+    // }
+
+    if (water) {
+      water.material.uniforms[ 'time' ].value += 1.0 / 60.0;
     }
 
     renderer.render(scene, camera);

@@ -1,7 +1,7 @@
 import * as d3 from "https://cdn.skypack.dev/d3@7";
 import VaultHill from "./vault-hill.js";
 
-let sidebarShown = true, vaultHill, threeD = false;
+let sidebarShown = false, vaultHill, threeD = false;
 
 d3.select('#toggler').on('click', toggleSidebar);
 // d3.select('#threeDBtn').on('click', toggleThreeD);
