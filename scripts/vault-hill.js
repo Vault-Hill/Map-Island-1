@@ -179,19 +179,20 @@ function VaultHill({
     });
 
     const lakes = new THREE.MeshBasicMaterial({
-      color: colors.Water,
+      // color: colors.Water,
       side: THREE.BackSide,
-      flatShading: true,
+      map: new THREE.TextureLoader().load( 'images/textures/lake.jpeg',function (texture) {
+        texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+      })
     });
 
     const matLine = new LineMaterial({
       color: colors.Bridges,
       linewidth: 1, // px
-      alphaToCoverage: true,
       resolution: new THREE.Vector2(width, height), // resolution of the viewport
       dashed: false,
-      alphaToCoverage: true,
-      side: THREE.BackSide,
+      // alphaToCoverage: true,
+      side: THREE.FrontSide,
     });
 
     return {
