@@ -51,6 +51,19 @@ Promise.all([
       bridges: bridgesData,
       lakes: lakesData,
     },
+    container: "#scene",
+    onLandClick: (land) => {
+      const el = d3.select('#land_info');
+
+      if (land) {
+        el.html(`
+          <div style="margin-bottom: 10px">ID: ${land.ID}</div>
+          <div>NAME: ${land.Name}</div>
+        `)
+      } else {
+        el.html('');
+      }
+    }
   });
 });
 

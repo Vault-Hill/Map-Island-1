@@ -1,6 +1,10 @@
 import * as THREE from "../libs/three.module.js";
 import { OrbitControls } from "../libs/OrbitControls.js";
-import {LineGeometry, LineMaterial, Line2} from "../libs/three-fatline.module.js";
+import {
+  LineGeometry,
+  LineMaterial,
+  Line2,
+} from "../libs/three-fatline.module.js";
 
 const colors = {
   Water: 0x122230,
@@ -12,6 +16,7 @@ const colors = {
   Deluxe: 0x75bac1,
   Premium: 0x4aa6af,
   Standard: 0x00929c,
+  Highlight: 0xd91e18,
 };
 
 const sizes = {
@@ -21,7 +26,11 @@ const sizes = {
   Standard: 8,
 };
 
-function VaultHill({ data = {}, container = "#scene" }) {
+function VaultHill({
+  data = {},
+  container = "#scene",
+  onLandClick = () => {},
+}) {
   var scene,
     camera,
     renderer,
@@ -35,7 +44,7 @@ function VaultHill({ data = {}, container = "#scene" }) {
 
   const pointer = new THREE.Vector2();
   const tooltip = {};
-  const maxZ = Math.max(...data.lands.map(d => d.y1));
+  const maxZ = Math.max(...data.lands.map((d) => d.y1));
 
   function createStreets() {
     const greens = new THREE.Group();
@@ -62,26 +71,30 @@ function VaultHill({ data = {}, container = "#scene" }) {
     };
 
     const materials = {
-      Exclusive: new THREE.MeshStandardMaterial({
-        color: colors.Exclusive,
-        flatShading: true,
-        side: THREE.DoubleSide,
-      }),
-      Deluxe: new THREE.MeshStandardMaterial({
-        color: colors.Deluxe,
-        flatShading: true,
-        side: THREE.DoubleSide,
-      }),
-      Premium: new THREE.MeshStandardMaterial({
-        color: colors.Premium,
-        flatShading: true,
-        side: THREE.DoubleSide,
-      }),
-      Standard: new THREE.MeshStandardMaterial({
-        color: colors.Standard,
-        flatShading: true,
-        side: THREE.DoubleSide,
-      }),
+      Exclusive: () =>
+        new THREE.MeshStandardMaterial({
+          color: colors.Exclusive,
+          flatShading: true,
+          side: THREE.DoubleSide,
+        }),
+      Deluxe: () =>
+        new THREE.MeshStandardMaterial({
+          color: colors.Deluxe,
+          flatShading: true,
+          side: THREE.DoubleSide,
+        }),
+      Premium: () =>
+        new THREE.MeshStandardMaterial({
+          color: colors.Premium,
+          flatShading: true,
+          side: THREE.DoubleSide,
+        }),
+      Standard: () =>
+        new THREE.MeshStandardMaterial({
+          color: colors.Standard,
+          flatShading: true,
+          side: THREE.DoubleSide,
+        }),
     };
 
     lands = new THREE.Group();
@@ -91,7 +104,7 @@ function VaultHill({ data = {}, container = "#scene" }) {
       const type = rest.Name.split("_")[0];
 
       const geometry = geometries[type];
-      const material = materials[type];
+      const material = materials[type]();
 
       const mesh = new THREE.Mesh(geometry, material);
 
@@ -206,7 +219,7 @@ function VaultHill({ data = {}, container = "#scene" }) {
       greenLands,
       streets,
       matLine,
-      lakes
+      lakes,
     };
   }
 
@@ -215,27 +228,24 @@ function VaultHill({ data = {}, container = "#scene" }) {
     geometry.setPositions(pos);
     const line = new Line2(geometry, materials.matLine);
     line.computeLineDistances();
-    line.scale.set( 1, 1, 1 );
-    scene.add( line );
+    line.scale.set(1, 1, 1);
+    scene.add(line);
   }
 
   function createBridges() {
-
     const y = -1;
 
-    data.bridges
-      .forEach(({ Name, coords }) => {
-        const isParralel = Name.includes("Parallels");
+    data.bridges.forEach(({ Name, coords }) => {
+      const isParralel = Name.includes("Parallels");
 
-        const positions = coords.flatMap(d => [d[0], y, d[1]]);
+      const positions = coords.flatMap((d) => [d[0], y, d[1]]);
 
-        if (!isParralel) {
-          positions.push(coords[0][0], y, coords[0][1]);
-        }
+      if (!isParralel) {
+        positions.push(coords[0][0], y, coords[0][1]);
+      }
 
-        createLine(positions)
-      });
-
+      createLine(positions);
+    });
   }
 
   function createObjects() {
@@ -276,13 +286,22 @@ function VaultHill({ data = {}, container = "#scene" }) {
 
   function createRenderer() {
     renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setClearColor( 0x000000, 0.0 );
+    renderer.setClearColor(0x000000, 0.0);
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(width, height);
     renderer.clearDepth(); // important!
 
-    document.querySelector(container).appendChild(renderer.domElement);
-    document.body.addEventListener("mousemove", onPointerMove);
+    const el = document.querySelector(container);
+    el.appendChild(renderer.domElement);
+
+    el.addEventListener("mousemove", onPointerMove);
+    el.addEventListener("click", () => {
+      if (INTERSECTED) {
+        onLandClick(INTERSECTED.userData);
+      } else {
+        onLandClick(null)
+      }
+    });
 
     // ???
     // renderer.gammaFactor = 2.2;
@@ -318,17 +337,20 @@ function VaultHill({ data = {}, container = "#scene" }) {
 
     if (intersects.length > 0) {
       if (INTERSECTED != intersects[0].object) {
-        if (INTERSECTED)
-          INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
+        if (INTERSECTED) {
+          INTERSECTED.material.color.setHex(INTERSECTED.currentHex);
+        }
 
         INTERSECTED = intersects[0].object;
-        INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
-        INTERSECTED.material.emissive.setHex(0xff0000);
+        INTERSECTED.currentHex = INTERSECTED.material.color.getHex();
+        INTERSECTED.material.color.setHex(colors.Highlight);
         showTooltip();
       }
     } else {
-      if (INTERSECTED)
-        INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
+      if (INTERSECTED) {
+        INTERSECTED.material.color.setHex(INTERSECTED.currentHex);
+      }
+
       INTERSECTED = null;
       hideTooltip();
     }
@@ -385,22 +407,22 @@ function VaultHill({ data = {}, container = "#scene" }) {
 
   function showTooltip() {
     if (!INTERSECTED) return hideTooltip();
-  
+
     const t = document.getElementById("tooltip");
     const datum = INTERSECTED.userData;
-  
+
     t.style.left = tooltip.x + 5 + "px";
     t.style.top = tooltip.y + 5 + "px";
-  
+
     t.innerHTML = `
             <div style="margin-bottom: 10px">ID: ${datum.ID}</div>
             <div>NAME: ${datum.Name}</div>
           `;
   }
-  
+
   function hideTooltip() {
     const t = document.getElementById("tooltip");
-  
+
     t.style.left = "-350px";
     t.innerHTML = "";
   }

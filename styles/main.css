@@ -1,3 +1,7 @@
+* {
+  box-sizing: border-box;
+}
+
 body {
   background-color: #122230;
   padding: 0;
@@ -17,4 +21,49 @@ body {
   background-color: #fff;
   padding: 15px;
   border-radius: 5px;
+}
+
+.sidebar {
+  width: 300px;
+  height: 100vh;
+  position: absolute;
+  top: 0;
+  left: 0;
+  transition: left 250ms ease 0s;
+  padding: 20px;
+}
+
+.sidebar__inner {
+  background-color: rgb(41, 50, 60);
+  color: white;
+  padding: 16px;
+  height: 100%;
+}
+
+.sidebar__close {
+  position: absolute;
+  left: 290px;
+  top: 20px;
+  -webkit-box-align: center;
+  align-items: center;
+  box-shadow: rgb(0 0 0 / 20%) 0px 1px 3px;
+  -webkit-box-pack: center;
+  justify-content: center;
+  background-color: rgb(106, 116, 133);
+  border-radius: 1px;
+  color: rgb(41, 50, 60);
+  display: flex;
+  height: 20px;
+  width: 20px;
+  cursor: pointer;
+  transition: left 250ms ease 0s;
+}
+
+.sidebar.sidebar__hidden {
+  left: -300px;
+}
+
+.sidebar__close.sidebar__hidden {
+  left: 20px !important;
+  transform: rotate(180deg);
 }
