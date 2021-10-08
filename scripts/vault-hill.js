@@ -200,12 +200,12 @@ function VaultHill({
 
     const matLine = new LineMaterial({
       color: colors.Bridges,
-      flatShading: true,
-      linewidth: 2, // px
-      worldUnits: true,
+      // flatShading: true,
+      linewidth: 1, // px
+      // worldUnits: true,
       depthWrite: false,
       alphaToCoverage: true,
-      needsUpdate: true,
+      // needsUpdate: true,
       polygonOffset: true,
       polygonOffsetFactor: -1,
       polygonOffsetUnits: 1,
@@ -376,7 +376,8 @@ function VaultHill({
 
     createLights();
     createObjects();
-
+    // const axesHelper = new THREE.AxesHelper( 5000 );
+    // scene.add( axesHelper );
     animate();
   }
 
@@ -430,7 +431,16 @@ function VaultHill({
   init();
   window.addEventListener("resize", onWindowResize);
 
-  return {};
+  return {
+    // updateCamera(threeD) {
+    //   if (threeD) {
+    //     camera.position.set(0, maxZ * 2, maxZ * 2);
+    //   } else {
+    //     camera.position.set(0, maxZ * 2, 0);
+    //   }
+    //   controls.update();
+    // }
+  };
 }
 
 export default VaultHill;

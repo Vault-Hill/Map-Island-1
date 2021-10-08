@@ -1,6 +1,11 @@
 import * as d3 from "https://cdn.skypack.dev/d3@7";
 import VaultHill from "./vault-hill.js";
 
+let sidebarShown = true, vaultHill, threeD = false;
+
+d3.select('#toggler').on('click', toggleSidebar);
+// d3.select('#threeDBtn').on('click', toggleThreeD);
+
 Promise.all([
   d3.csv("./data/data.csv", d3.autoType),
   d3.dsv(";", "./data/VHC_MAPandGreens.csv"),
@@ -42,7 +47,7 @@ Promise.all([
 
   const bridgesData = processCoords(bridges);
 
-  const vaultHill = VaultHill({
+  vaultHill = VaultHill({
     data: {
       lands: data,
       greenAreas: [...greenData, ...hillsData],
@@ -83,3 +88,20 @@ function processCoords(greens, index = 2) {
     };
   });
 }
+
+function toggleSidebar() {
+  sidebarShown = !sidebarShown;
+  
+  const s = document.querySelector('#sidebar');
+  s.setAttribute('class', 'sidebar' + (sidebarShown ? '' : ' sidebar__hidden'));
+
+  const t = document.querySelector('#toggler');
+  t.setAttribute('class', 'sidebar__close' + (sidebarShown ? '' : ' sidebar__hidden'));
+}
+
+// function toggleThreeD() {
+//   threeD = !threeD;
+
+//   d3.select(this).html(threeD ? '2D' : '3D');
+//   // vaultHill.updateCamera(threeD);
+// }
