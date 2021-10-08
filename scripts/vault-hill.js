@@ -145,7 +145,7 @@ function VaultHill({
     data.commonSpaces.forEach((d) => {
       const p = createPolygon(d.coords);
 
-      const land = new THREE.Mesh(p, materials.greenLands);
+      const land = new THREE.Mesh(p, materials.greenAreas);
 
       land.position.y = worldYPosition;
       land.rotateX(Math.PI / 2);
@@ -158,18 +158,29 @@ function VaultHill({
 
   function createMaterials() {
     const greenLands = new THREE.MeshBasicMaterial({
+      // color: colors.Green,
+      map: new THREE.TextureLoader().load( 'images/textures/grass.jpeg',function (texture) {
+        texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+      }),
+      side: THREE.BackSide,
+    });
+
+    const greenAreas = new THREE.MeshBasicMaterial({
       color: colors.Green,
-      side: THREE.DoubleSide,
+      side: THREE.BackSide,
     });
 
     const streets = new THREE.MeshBasicMaterial({
-      color: colors.Streets,
-      side: THREE.DoubleSide,
+      // color: colors.Streets,
+      map: new THREE.TextureLoader().load( 'images/textures/gravel.jpeg',function (texture) {
+        texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+      }),
+      side: THREE.BackSide,
     });
 
     const lakes = new THREE.MeshBasicMaterial({
       color: colors.Water,
-      side: THREE.DoubleSide,
+      side: THREE.BackSide,
       flatShading: true,
     });
 
@@ -180,10 +191,12 @@ function VaultHill({
       resolution: new THREE.Vector2(width, height), // resolution of the viewport
       dashed: false,
       alphaToCoverage: true,
+      side: THREE.BackSide,
     });
 
     return {
       greenLands,
+      greenAreas,
       streets,
       matLine,
       lakes,
