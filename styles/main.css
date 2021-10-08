@@ -19,7 +19,8 @@ body {
   position: absolute;
   top: 0px;
   left: -350px;
-  background-color: #fff;
+  background-color: #5E738B;
+  color: #fff;
   padding: 15px;
   border-radius: 5px;
 }
