@@ -5,7 +5,9 @@ import {
   LineMaterial,
   Line2,
 } from "../libs/three-fatline.module.js";
-
+import {Sky} from '../libs/Sky.js';
+import {Water} from '../libs/Water.js';
+const worldYPosition = 0.1;
 const colors = {
   Water: 0x122230,
   Green: 0x041922,
@@ -20,16 +22,17 @@ const colors = {
 };
 
 const sizes = {
-  Exclusive: 48,
-  Deluxe: 32,
-  Premium: 16,
-  Standard: 8,
+  Exclusive: 48 / 1000,
+  Deluxe: 32 / 1000,
+  Premium: 16 / 1000,
+  Standard: 8 / 1000,
 };
 
 function VaultHill({
   data = {},
   container = "#scene",
   onLandClick = () => {},
+  material = "dark"
 }) {
   var scene,
     camera,
@@ -40,11 +43,32 @@ function VaultHill({
     height = window.innerHeight,
     width = window.innerWidth,
     lands,
-    materials;
+    materials,
+    sun,
+    sky,
+    water,
+    world;
 
   const pointer = new THREE.Vector2();
   const tooltip = {};
-  const maxZ = Math.max(...data.lands.map((d) => d.y1));
+
+  function createGreenAreas() {
+    const greens = new THREE.Group();
+
+    data.greenAreas.forEach((d) => {
+      const p = createPolygon(d.coords);
+
+      const land = new THREE.Mesh(p, materials.greenLands);
+
+      land.position.y = worldYPosition - 0.02;
+      land.renderOrder = 0;
+      land.rotateX(Math.PI / 2);
+
+      greens.add(land);
+    });
+
+    world.add(greens)
+  }
 
   function createStreets() {
     const greens = new THREE.Group();
@@ -53,24 +77,116 @@ function VaultHill({
       const p = createPolygon(d.coords);
 
       const land = new THREE.Mesh(p, materials.streets);
-      land.renderDepth = 0;
+      land.position.y = worldYPosition - 0.01;
+      land.renderOrder = 1;
+      land.rotateX(Math.PI / 2);
+
+      greens.add(land);
+    });
+    
+    world.add(greens);
+  }
+
+  function createLakes() {
+    const lakes = new THREE.Group();
+
+    data.lakes.forEach((d) => {
+      const p = createPolygon(d.coords);
+
+      const land = new THREE.Mesh(p, materials.lakes);
+      land.renderOrder = 3;
+      land.position.y = worldYPosition;
+      land.rotateX(Math.PI / 2);
+
+      lakes.add(land);
+    });
+
+    world.add(lakes);
+  }
+
+  function createLands() {
+    const size = 32 / 1000;
+    const geometries = {
+      Exclusive: new THREE.BoxGeometry(size, sizes.Exclusive, size),
+      Deluxe: new THREE.BoxGeometry(size, sizes.Deluxe, size),
+      Premium: new THREE.BoxGeometry(size, sizes.Premium, size),
+      Standard: new THREE.BoxGeometry(size, sizes.Standard, size),
+    };
+
+    lands = new THREE.Group();
+
+    for (let i = 0; i < data.lands.length; i++) {
+      const { x1, y1, ...rest } = data.lands[i];
+      const type = rest.Name.split("_")[0];
+
+      const geometry = geometries[type];
+      const material = materials[type]();
+      const size = sizes[type];
+
+      const mesh = new THREE.Mesh(geometry, material);
+
+      mesh.userData = rest;
+      mesh.position.x = x1;
+      mesh.position.y = worldYPosition + size / 2;
+      mesh.position.z = y1;
+
+      mesh.updateMatrix();
+      mesh.matrixAutoUpdate = false;
+
+      lands.add(mesh);
+    }
+
+    world.add(lands);
+  }
+
+  function createCommonSpaces() {
+    const greens = new THREE.Group();
+
+    data.commonSpaces.forEach((d) => {
+      const p = createPolygon(d.coords);
+
+      const land = new THREE.Mesh(p, materials.greenLands);
+
+      land.position.y = worldYPosition;
       land.rotateX(Math.PI / 2);
 
       greens.add(land);
     });
 
-    scene.add(greens);
+    world.add(greens);
   }
 
-  function createLands() {
-    const geometries = {
-      Exclusive: new THREE.BoxGeometry(32, sizes.Exclusive, 32),
-      Deluxe: new THREE.BoxGeometry(32, sizes.Deluxe, 32),
-      Premium: new THREE.BoxGeometry(32, sizes.Premium, 32),
-      Standard: new THREE.BoxGeometry(32, sizes.Standard, 32),
-    };
+  function createMaterials() {
+    const greenLands = new THREE.MeshBasicMaterial({
+      color: colors.Green,
+      side: THREE.DoubleSide,
+    });
 
-    const materials = {
+    const streets = new THREE.MeshBasicMaterial({
+      color: colors.Streets,
+      side: THREE.DoubleSide,
+    });
+
+    const lakes = new THREE.MeshBasicMaterial({
+      color: colors.Water,
+      side: THREE.DoubleSide,
+      flatShading: true,
+    });
+
+    const matLine = new LineMaterial({
+      color: colors.Bridges,
+      linewidth: 1, // px
+      alphaToCoverage: true,
+      resolution: new THREE.Vector2(width, height), // resolution of the viewport
+      dashed: false,
+      alphaToCoverage: true,
+    });
+
+    return {
+      greenLands,
+      streets,
+      matLine,
+      lakes,
       Exclusive: () =>
         new THREE.MeshStandardMaterial({
           color: colors.Exclusive,
@@ -96,131 +212,6 @@ function VaultHill({
           side: THREE.DoubleSide,
         }),
     };
-
-    lands = new THREE.Group();
-
-    for (let i = 0; i < data.lands.length; i++) {
-      const { x1, y1, ...rest } = data.lands[i];
-      const type = rest.Name.split("_")[0];
-
-      const geometry = geometries[type];
-      const material = materials[type]();
-
-      const mesh = new THREE.Mesh(geometry, material);
-
-      mesh.userData = rest;
-      mesh.position.x = x1;
-      mesh.position.y = 0;
-      mesh.position.z = y1;
-
-      mesh.updateMatrix();
-      mesh.matrixAutoUpdate = false;
-
-      lands.add(mesh);
-    }
-
-    scene.add(lands);
-  }
-
-  function createGreenAreas() {
-    const greens = new THREE.Group();
-
-    data.greenAreas.forEach((d) => {
-      const p = createPolygon(d.coords);
-
-      const land = new THREE.Mesh(p, materials.greenLands);
-      land.renderDepth = 0;
-      land.rotateX(Math.PI / 2);
-
-      greens.add(land);
-    });
-
-    scene.add(greens);
-  }
-
-  function createCommonSpaces() {
-    const greens = new THREE.Group();
-
-    data.commonSpaces.forEach((d) => {
-      const p = createPolygon(d.coords);
-
-      const land = new THREE.Mesh(p, materials.greenLands);
-      land.renderDepth = 0;
-      land.rotateX(Math.PI / 2);
-
-      greens.add(land);
-    });
-
-    scene.add(greens);
-  }
-
-  function createLakes() {
-    const lakes = new THREE.Group();
-
-    data.lakes.forEach((d) => {
-      const p = createPolygon(d.coords);
-
-      const land = new THREE.Mesh(p, materials.lakes);
-      land.renderDepth = 0;
-      land.rotateX(Math.PI / 2);
-
-      lakes.add(land);
-    });
-
-    scene.add(lakes);
-  }
-
-  function createMaterials() {
-    const greenLands = new THREE.MeshBasicMaterial({
-      color: colors.Green,
-      depthWrite: false,
-      side: THREE.DoubleSide,
-      polygonOffset: true,
-      polygonOffsetFactor: -4,
-      polygonOffsetUnits: 1,
-    });
-
-    const streets = new THREE.MeshBasicMaterial({
-      color: colors.Streets,
-      depthWrite: false,
-      side: THREE.DoubleSide,
-      polygonOffset: true,
-      polygonOffsetFactor: -4,
-      polygonOffsetUnits: 1,
-    });
-
-    const lakes = new THREE.MeshBasicMaterial({
-      color: colors.Water,
-      depthWrite: false,
-      side: THREE.DoubleSide,
-      polygonOffset: true,
-      polygonOffsetFactor: -2,
-      polygonOffsetUnits: 1,
-    });
-
-    const matLine = new LineMaterial({
-      color: colors.Bridges,
-      // flatShading: true,
-      linewidth: 1, // px
-      // worldUnits: true,
-      depthWrite: false,
-      alphaToCoverage: true,
-      // needsUpdate: true,
-      polygonOffset: true,
-      polygonOffsetFactor: -1,
-      polygonOffsetUnits: 1,
-      resolution: new THREE.Vector2(width, height), // resolution of the viewport
-      dashed: false,
-      alphaToCoverage: true,
-      // dashed, dashScale, dashSize, gapSize
-    });
-
-    return {
-      greenLands,
-      streets,
-      matLine,
-      lakes,
-    };
   }
 
   function createLine(pos) {
@@ -229,11 +220,11 @@ function VaultHill({
     const line = new Line2(geometry, materials.matLine);
     line.computeLineDistances();
     line.scale.set(1, 1, 1);
-    scene.add(line);
+    world.add(line);
   }
 
   function createBridges() {
-    const y = -1;
+    const y = worldYPosition;
 
     data.bridges.forEach(({ Name, coords }) => {
       const isParralel = Name.includes("Parallels");
@@ -250,13 +241,81 @@ function VaultHill({
 
   function createObjects() {
     materials = createMaterials();
+    world = new THREE.Group();
 
+    if (material === "ocean") {
+      createWater();
+    }
     createGreenAreas();
     createStreets();
     createCommonSpaces();
     createLands();
     createBridges();
     createLakes();
+
+    scene.add(world);
+  }
+
+  function createWater() {
+    sun = new THREE.Vector3();
+
+    // Water
+
+    const waterGeometry = new THREE.PlaneGeometry(10000, 10000);
+
+    water = new Water(waterGeometry, {
+      textureWidth: 512,
+      textureHeight: 512,
+      waterNormals: new THREE.TextureLoader().load(
+        "images/textures/waternormals.jpeg",
+        function (texture) {
+          texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+        }
+      ),
+      sunDirection: new THREE.Vector3(),
+      sunColor: 0xffffff,
+      waterColor: 0x001e0f,
+      distortionScale: 5.7,
+      fog: scene.fog !== undefined,
+    });
+
+    water.rotation.x = -Math.PI / 2;
+
+    scene.add(water);
+
+    // Skybox
+
+    sky = new Sky();
+    sky.scale.setScalar(10000);
+    scene.add(sky);
+
+    const skyUniforms = sky.material.uniforms;
+
+    skyUniforms["turbidity"].value = 10;
+    skyUniforms["rayleigh"].value = 2;
+    skyUniforms["mieCoefficient"].value = 0.005;
+    skyUniforms["mieDirectionalG"].value = 0.8;
+
+    const parameters = {
+      elevation: 1,
+      azimuth: 160,
+    };
+
+    const pmremGenerator = new THREE.PMREMGenerator(renderer);
+
+    function updateSun() {
+      const phi = THREE.MathUtils.degToRad(90 - parameters.elevation);
+      const theta = THREE.MathUtils.degToRad(parameters.azimuth);
+
+      sun.setFromSphericalCoords(1, phi, theta);
+
+      sky.material.uniforms["sunPosition"].value.copy(sun);
+      water.material.uniforms["sunDirection"].value.copy(sun).normalize();
+
+      scene.environment = pmremGenerator.fromScene(sky).texture;
+    }
+
+    updateSun();
   }
 
   function createControls() {
@@ -268,24 +327,25 @@ function VaultHill({
 
     controls.screenSpacePanning = false;
 
-    controls.minDistance = 100;
-    controls.maxDistance = maxZ * 5;
+    controls.minDistance = 1;
+    controls.maxDistance = 100;
 
     controls.maxPolarAngle = Math.PI / 2.5;
   }
 
   function createCamera() {
-    const fov = 60; // Field of View. In DEGREES [1, 179]
+    const fov = 55; // Field of View. In DEGREES [1, 179]
     const aspect = width / height;
-    const near = 0.01; // the near clipping plane
-    const far = 100000; // the far clipping plane
+    const near = 0.1; // the near clipping plane
+    const far = 20000; // the far clipping plane
 
     camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-    camera.position.set(0, maxZ * 2, 0);
+    camera.position.set(0, 0, 20);
   }
 
   function createRenderer() {
     renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.setClearColor(0x000000, 0.0);
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(width, height);
@@ -299,7 +359,7 @@ function VaultHill({
       if (INTERSECTED) {
         onLandClick(INTERSECTED.userData);
       } else {
-        onLandClick(null)
+        onLandClick(null);
       }
     });
 
@@ -318,15 +378,15 @@ function VaultHill({
   }
 
   function createLights() {
-    const dirLight1 = new THREE.DirectionalLight(0xffffff, 1);
+    const dirLight1 = new THREE.DirectionalLight(0xffffff, 0.5);
     dirLight1.position.set(-10, -10, -10);
     scene.add(dirLight1);
 
-    const dirLight2 = new THREE.DirectionalLight(0xffffff, 1);
+    const dirLight2 = new THREE.DirectionalLight(0xffffff, 0.5);
     dirLight2.position.set(10, 10, 10);
     scene.add(dirLight2);
 
-    const ambientLight = new THREE.AmbientLight(0xffffff, 1);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
     scene.add(ambientLight);
   }
 
@@ -355,6 +415,10 @@ function VaultHill({
       hideTooltip();
     }
 
+    if (water) {
+      water.material.uniforms[ 'time' ].value += 1.0 / 120.0;
+    }
+
     renderer.render(scene, camera);
   }
 
@@ -376,7 +440,7 @@ function VaultHill({
 
     createLights();
     createObjects();
-    // const axesHelper = new THREE.AxesHelper( 5000 );
+    // const axesHelper = new THREE.AxesHelper( 5 );
     // scene.add( axesHelper );
     animate();
   }
@@ -439,7 +503,24 @@ function VaultHill({
     //     camera.position.set(0, maxZ * 2, 0);
     //   }
     //   controls.update();
-    // }
+    // },
+    updateMaterial(name) {
+      switch (name) {
+        case "ocean":
+          createWater();
+          break;
+
+        case "dark":
+          water.geometry.dispose();
+          sky.geometry.dispose();
+          scene.remove(water);
+          scene.remove(sky);
+          break;
+      
+        default:
+          break;
+      }
+    }
   };
 }
 

@@ -8,25 +8,45 @@
       content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
     />
 
-    <link rel="stylesheet" href="./styles/main.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles/main.css" />
   </head>
 
   <body>
-    <div id="sidebar" class="sidebar">
+    <div id="sidebar" class="sidebar sidebar__hidden">
       <div class="sidebar__inner">
         <!-- <div>
           <button id="threeDBtn">3D</button>
         </div> -->
+        <div class="space-below">
+          <label>Select texture</label>
+          <select id="texture_selector">
+            <option value="ocean">Ocean</option>
+            <option value="dark">Dark</option>
+          </select>
+        </div>
+
         <div id="land_info" class="land-info"></div>
       </div>
     </div>
 
-    <div 
-      id="toggler"
-      class="sidebar__close">
-        <svg viewBox="0 0 64 64" width="12px" height="12px" class="data-ex-icons-arrowright " style="transform: rotate(180deg);">
-          <path d="M26.7,54.7l-4.5-4.4c-0.4-0.4-0.4-1,0-1.4L38.6,33L22.2,17c-0.4-0.4-0.4-1,0-1.5l4.5-4.4c0.4-0.4,1.1-0.4,1.5,0 l17.1,16.7l4.5,4.4c0.4,0.4,0.4,1,0,1.4L45.2,38L28.2,54.7C27.8,55.1,27.1,55.1,26.7,54.7"></path>
-        </svg>
+    <div id="toggler" class="sidebar__close sidebar__hidden">
+      <svg
+        viewBox="0 0 64 64"
+        width="12px"
+        height="12px"
+        class="data-ex-icons-arrowright"
+        style="transform: rotate(180deg)"
+      >
+        <path
+          d="M26.7,54.7l-4.5-4.4c-0.4-0.4-0.4-1,0-1.4L38.6,33L22.2,17c-0.4-0.4-0.4-1,0-1.5l4.5-4.4c0.4-0.4,1.1-0.4,1.5,0 l17.1,16.7l4.5,4.4c0.4,0.4,0.4,1,0,1.4L45.2,38L28.2,54.7C27.8,55.1,27.1,55.1,26.7,54.7"
+        ></path>
+      </svg>
     </div>
 
     <div id="tooltip"></div>
