@@ -7,26 +7,13 @@ import {
 } from "../libs/three-fatline.module.js";
 import {Sky} from '../libs/Sky.js';
 import {Water} from '../libs/Water.js';
-const worldYPosition = 0.1;
-const colors = {
-  Water: 0x122230,
-  Green: 0x041922,
-  Ground: 0x0a0f1d,
-  Streets: 0x32495c,
-  Bridges: 0x103665,
-  Exclusive: 0xc1e5e6,
-  Deluxe: 0x75bac1,
-  Premium: 0x4aa6af,
-  Standard: 0x00929c,
-  Highlight: 0xd91e18,
-};
-
-const sizes = {
-  Exclusive: 48 / 1000,
-  Deluxe: 32 / 1000,
-  Premium: 16 / 1000,
-  Standard: 8 / 1000,
-};
+import {
+  worldYPosition,
+  scaleFactor,
+  theme,
+  sizes,
+  waterMaterial
+} from "./constants.js";
 
 function VaultHill({
   data = {},
@@ -47,7 +34,8 @@ function VaultHill({
     sun,
     sky,
     water,
-    world;
+    world,
+    colors = theme[material || "dark"];
 
   const pointer = new THREE.Vector2();
   const tooltip = {};
@@ -105,7 +93,7 @@ function VaultHill({
   }
 
   function createLands() {
-    const size = 32 / 1000;
+    const size = 32 / scaleFactor;
     const geometries = {
       Exclusive: new THREE.BoxGeometry(size, sizes.Exclusive, size),
       Deluxe: new THREE.BoxGeometry(size, sizes.Deluxe, size),
@@ -159,7 +147,7 @@ function VaultHill({
   function createMaterials() {
     const greenLands = new THREE.MeshBasicMaterial({
       // color: colors.Green,
-      map: new THREE.TextureLoader().load( 'images/textures/grass.jpeg',function (texture) {
+      map: new THREE.TextureLoader().load(colors.greenLandMaterial,function (texture) {
         texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
       }),
       side: THREE.BackSide,
@@ -172,16 +160,16 @@ function VaultHill({
 
     const streets = new THREE.MeshBasicMaterial({
       // color: colors.Streets,
-      map: new THREE.TextureLoader().load( 'images/textures/gravel.jpeg',function (texture) {
+      map: new THREE.TextureLoader().load(colors.streetMaterial, function (texture) {
         texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
       }),
       side: THREE.BackSide,
     });
 
     const lakes = new THREE.MeshBasicMaterial({
-      // color: colors.Water,
+      color: colors.Water,
       side: THREE.BackSide,
-      map: new THREE.TextureLoader().load( 'images/textures/lake.jpeg',function (texture) {
+      map: new THREE.TextureLoader().load(colors.lakeMaterial, function (texture) {
         texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
       })
     });
@@ -191,7 +179,6 @@ function VaultHill({
       linewidth: 1, // px
       resolution: new THREE.Vector2(width, height), // resolution of the viewport
       dashed: false,
-      // alphaToCoverage: true,
       side: THREE.FrontSide,
     });
 
@@ -260,6 +247,7 @@ function VaultHill({
     if (material === "ocean") {
       createWater();
     }
+
     createGreenAreas();
     createStreets();
     createCommonSpaces();
@@ -281,7 +269,7 @@ function VaultHill({
       textureWidth: 512,
       textureHeight: 512,
       waterNormals: new THREE.TextureLoader().load(
-        "images/textures/waternormals.jpeg",
+        waterMaterial,
         function (texture) {
           texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
         }
@@ -294,6 +282,8 @@ function VaultHill({
     });
 
     water.rotation.x = -Math.PI / 2;
+
+    water.material.uniforms.size.value = 15;
 
     scene.add(water);
 
@@ -342,7 +332,7 @@ function VaultHill({
     controls.screenSpacePanning = false;
 
     controls.minDistance = 1;
-    controls.maxDistance = 100;
+    controls.maxDistance = 20;
 
     controls.maxPolarAngle = Math.PI / 2.5;
   }
@@ -521,10 +511,23 @@ function VaultHill({
     updateMaterial(name) {
       switch (name) {
         case "ocean":
+          colors = theme.ocean;
           createWater();
           break;
 
         case "dark":
+          colors = theme.dark;
+          materials = createMaterials();
+          water.geometry.dispose();
+          sky.geometry.dispose();
+          scene.remove(water);
+          scene.remove(sky);
+          break;
+
+        case "light":
+          colors = theme.light;
+          materials = createMaterials();
+
           water.geometry.dispose();
           sky.geometry.dispose();
           scene.remove(water);
