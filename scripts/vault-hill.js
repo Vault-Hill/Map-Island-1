@@ -522,11 +522,13 @@ function VaultHill({
           sky.geometry.dispose();
           scene.remove(water);
           scene.remove(sky);
+          scene.background = new THREE.Color(colors.Water);
           break;
 
         case "light":
           colors = theme.light;
           materials = createMaterials();
+          scene.background = new THREE.Color(colors.Water);
 
           water.geometry.dispose();
           sky.geometry.dispose();
