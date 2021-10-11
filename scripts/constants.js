@@ -8,6 +8,7 @@ export const theme = {
     greenLandMaterial: 'images/textures/grass.jpeg',
     streetMaterial: 'images/textures/gravel.jpeg',
     lakeMaterial: 'images/textures/lake.jpeg',
+    Lake: 0x122230,
     Ground: 0x0a0f1d,
     Streets: 0x32495c,
     Bridges: 0x103665,
@@ -23,6 +24,7 @@ export const theme = {
     streetMaterial: 'images/textures/gravel.jpeg',
     greenLandMaterial: 'images/textures/grass.jpeg',
     lakeMaterial: 'images/textures/lake.jpeg',
+    Lake: 0x122230,
     Ground: 0x0a0f1d,
     Streets: 0x32495c,
     Bridges: 0x103665,
@@ -35,6 +37,7 @@ export const theme = {
   light: {
     Water: 0xffffff,
     Green: 0x00ff00,
+    Lake: 0x122230,
     streetMaterial: 'images/textures/gravel.jpeg',
     greenLandMaterial: 'images/textures/grass.jpeg',
     lakeMaterial: 'images/textures/lake.jpeg',

@@ -167,11 +167,11 @@ function VaultHill({
     });
 
     const lakes = new THREE.MeshBasicMaterial({
-      color: colors.Water,
+      color: colors.Lake,
       side: THREE.BackSide,
-      map: new THREE.TextureLoader().load(colors.lakeMaterial, function (texture) {
-        texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-      })
+      // map: new THREE.TextureLoader().load(colors.lakeMaterial, function (texture) {
+      //   texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+      // })
     });
 
     const matLine = new LineMaterial({
@@ -509,31 +509,43 @@ function VaultHill({
     //   controls.update();
     // },
     updateMaterial(name) {
+      material = name;
+
+      const update = () => {
+        materials = createMaterials();
+
+        scene.background = new THREE.Color(colors.Water);
+        scene.remove(world);
+
+        createObjects();
+
+        if (water && sky) {
+          water.geometry.dispose();
+          sky.geometry.dispose();
+          scene.remove(water);
+          scene.remove(sky);
+  
+          water = null;
+          sky = null;
+        }
+      };
+
       switch (name) {
         case "ocean":
           colors = theme.ocean;
           createWater();
+          update();
           break;
 
         case "dark":
           colors = theme.dark;
-          materials = createMaterials();
-          water.geometry.dispose();
-          sky.geometry.dispose();
-          scene.remove(water);
-          scene.remove(sky);
-          scene.background = new THREE.Color(colors.Water);
+          update();
+
           break;
 
         case "light":
           colors = theme.light;
-          materials = createMaterials();
-          scene.background = new THREE.Color(colors.Water);
-
-          water.geometry.dispose();
-          sky.geometry.dispose();
-          scene.remove(water);
-          scene.remove(sky);
+          update();
           break;
       
         default:
