@@ -3,10 +3,11 @@ import VaultHill from "./vault-hill.js";
 
 const scaleFactor = 1000;
 
-let sidebarShown = false, vaultHill, threeD = false;
+let sidebarShown = false, vaultHill, threeD = false, day = true;
 
 d3.select('#toggler').on('click', toggleSidebar);
-d3.select('#texture_selector').on('change', changeTexture)
+// d3.select('#texture_selector').on('change', changeTexture)
+d3.select('#day_night_toggle').on('click', toggleDayNight)
 // d3.select('#threeDBtn').on('click', toggleThreeD);
 
 Promise.all([
@@ -94,6 +95,14 @@ Promise.all([
     }
   });
 });
+
+function toggleDayNight() {
+  day = !day;
+
+  d3.select(this).classed('day-selected', day).classed('night-selected', !day);
+
+  vaultHill.updateMaterial(day ? 'ocean' : 'dark');
+}
 
 function changeTexture() {
   const val = this.value;

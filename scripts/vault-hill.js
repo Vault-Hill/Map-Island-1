@@ -146,7 +146,6 @@ function VaultHill({
 
   function createMaterials() {
     const greenLands = new THREE.MeshBasicMaterial({
-      // color: colors.Green,
       map: new THREE.TextureLoader().load(colors.greenLandMaterial,function (texture) {
         texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
       }),
@@ -169,9 +168,6 @@ function VaultHill({
     const lakes = new THREE.MeshBasicMaterial({
       color: colors.Lake,
       side: THREE.BackSide,
-      // map: new THREE.TextureLoader().load(colors.lakeMaterial, function (texture) {
-      //   texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-      // })
     });
 
     const matLine = new LineMaterial({
@@ -215,6 +211,29 @@ function VaultHill({
     };
   }
 
+  function updateMaterials() {
+    // green land texture
+    materials.greenLands.map = new THREE.TextureLoader().load(colors.greenLandMaterial,function (texture) {
+      texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+      materials.greenLands.map.needsUpdate = true;
+    });
+    
+    // green areas
+    materials.greenAreas.color.setHex(colors.Green);
+
+    // streets
+    materials.streets.map = new THREE.TextureLoader().load(colors.streetMaterial, function (texture) {
+      texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+      materials.streets.map.needsUpdate = true;
+    })
+
+    // matLine
+    materials.matLine.color.setHex(colors.Bridges);
+
+    // lakes
+    materials.lakes.color.setHex(colors.lakes);
+  }
+
   function createLine(pos) {
     const geometry = new LineGeometry();
     geometry.setPositions(pos);
@@ -244,10 +263,7 @@ function VaultHill({
     materials = createMaterials();
     world = new THREE.Group();
 
-    if (material === "ocean") {
-      createWater();
-    }
-
+    createWater();
     createGreenAreas();
     createStreets();
     createCommonSpaces();
@@ -276,8 +292,8 @@ function VaultHill({
       ),
       sunDirection: new THREE.Vector3(),
       sunColor: 0xffffff,
-      waterColor: 0x001e0f,
-      distortionScale: 5.7,
+      waterColor: 0x003C5F,
+      distortionScale: 3.7,
       fog: scene.fog !== undefined,
     });
 
@@ -285,13 +301,10 @@ function VaultHill({
 
     water.material.uniforms.size.value = 15;
 
-    scene.add(water);
-
     // Skybox
 
     sky = new Sky();
     sky.scale.setScalar(10000);
-    scene.add(sky);
 
     const skyUniforms = sky.material.uniforms;
 
@@ -301,7 +314,7 @@ function VaultHill({
     skyUniforms["mieDirectionalG"].value = 0.8;
 
     const parameters = {
-      elevation: 1,
+      elevation: 1.5,
       azimuth: 160,
     };
 
@@ -320,6 +333,11 @@ function VaultHill({
     }
 
     updateSun();
+
+    if (material === "ocean") {
+      scene.add(water);
+      scene.add(sky);
+    }
   }
 
   function createControls() {
@@ -500,47 +518,32 @@ function VaultHill({
   window.addEventListener("resize", onWindowResize);
 
   return {
-    // updateCamera(threeD) {
-    //   if (threeD) {
-    //     camera.position.set(0, maxZ * 2, maxZ * 2);
-    //   } else {
-    //     camera.position.set(0, maxZ * 2, 0);
-    //   }
-    //   controls.update();
-    // },
     updateMaterial(name) {
       material = name;
 
       const update = () => {
-        materials = createMaterials();
+        updateMaterials();
 
         scene.background = new THREE.Color(colors.Water);
-        scene.remove(world);
 
-        createObjects();
-
-        if (water && sky) {
-          water.geometry.dispose();
-          sky.geometry.dispose();
+        if (material === "ocean") {
+          scene.add(water);
+          scene.add(sky);
+        } else {
           scene.remove(water);
           scene.remove(sky);
-  
-          water = null;
-          sky = null;
         }
       };
 
       switch (name) {
         case "ocean":
           colors = theme.ocean;
-          createWater();
           update();
           break;
 
         case "dark":
           colors = theme.dark;
           update();
-
           break;
 
         case "light":

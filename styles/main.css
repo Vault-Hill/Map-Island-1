@@ -85,3 +85,42 @@ label {
   display: inline-block;
   color: #5E738B;
 }
+
+.day-night-toggle {
+  position: absolute;
+  top: 25px;
+  right: 25px;
+}
+
+.day-night-btn {
+  background-color: #5E738B;
+  border: none;
+  box-shadow: none;
+  padding: 5px 8px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.day-night-btn img {
+  width: 24px;
+  height: 24px;
+}
+
+.day-night-btn.day-selected img.night {
+  display: none;
+}
+
+.day-night-btn.day-selected img.day {
+  display: initial;
+}
+
+.day-night-btn.night-selected img.night {
+  display: initial;
+}
+
+.day-night-btn.night-selected img.day {
+  display: none;
+}

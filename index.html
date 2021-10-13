@@ -18,19 +18,26 @@
   </head>
 
   <body>
+    <div class="day-night-toggle">
+      <button class="day-night-btn day-selected" id="day_night_toggle">
+        <img class="day" src="./images/sun.png"/>
+        <img class="night" src="./images/moon1.png" />
+      </button>
+    </div>
+
     <div id="sidebar" class="sidebar sidebar__hidden">
       <div class="sidebar__inner">
         <!-- <div>
           <button id="threeDBtn">3D</button>
         </div> -->
-        <div class="space-below">
+        <!-- <div class="space-below">
           <label>Select texture</label>
           <select id="texture_selector">
             <option value="ocean">Ocean</option>
             <option value="dark">Dark</option>
             <option value="light">Light</option>
           </select>
-        </div>
+        </div> -->
 
         <div id="land_info" class="land-info"></div>
       </div>
