@@ -4,7 +4,7 @@ export const scaleFactor = 1000;
 export const theme = {
   ocean: {
     Water: 0x122230,
-    Green: 0x041922,
+    Green: 0x103665,
     greenLandMaterial: 'images/textures/grass.jpeg',
     streetMaterial: 'images/textures/gravel.jpeg',
     lakeMaterial: 'images/textures/lake.jpeg',
