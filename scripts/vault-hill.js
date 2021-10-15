@@ -108,7 +108,7 @@ function VaultHill({
     for (let i = 0; i < data.lands.length; i++) {
       const { x1, y1, ...rest } = data.lands[i];
       const type = rest.Name.split("_")[0];
-
+      console.log(type);
       const geometry = geometries[type];
       const material = materials[type]();
       const size = sizes[type];
