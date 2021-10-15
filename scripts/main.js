@@ -28,12 +28,12 @@ Promise.all([
 
     // columns that you want to keep
     const keys = [
-      'Name',
+      'Type',
       'District',
       'ID',
     ];
 
-    const obj = { x1, y1 };
+    const obj = { x1, y1, Name: d.Type, };
 
     keys.forEach(k => obj[k] = d[k]);
 
@@ -99,11 +99,15 @@ Promise.all([
             <div>${land.ID}</div>
           </div>
           <div>
-            <label>
-              NAME:
-            </label>
+            <label>NAME:</label>
             <div>
               ${land.Name}
+            </div>
+          </div>
+          <div>
+            <label>DISTRICT:</label>
+            <div>
+              ${land.District}
             </div>
           </div>
         `)

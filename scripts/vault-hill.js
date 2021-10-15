@@ -85,7 +85,7 @@ function VaultHill({
 
       const land = new THREE.Mesh(p, materials.lakes);
       land.renderOrder = 3;
-      land.position.y = worldYPosition;
+      land.position.y = worldYPosition - 0.005;
       land.rotateX(Math.PI / 2);
 
       lakes.add(land);
@@ -107,8 +107,8 @@ function VaultHill({
 
     for (let i = 0; i < data.lands.length; i++) {
       const { x1, y1, ...rest } = data.lands[i];
-      const type = rest.Name.split("_")[0];
-      console.log(type);
+      const type = rest.Type;
+
       const geometry = geometries[type];
       const material = materials[type]();
       const size = sizes[type];
@@ -137,7 +137,7 @@ function VaultHill({
 
       const land = new THREE.Mesh(p, materials.greenAreas);
 
-      land.position.y = worldYPosition;
+      land.position.y = worldYPosition - 0.01;
       land.rotateX(Math.PI / 2);
 
       greens.add(land);
@@ -524,7 +524,9 @@ function VaultHill({
 
     t.innerHTML = `
             <div style="margin-bottom: 10px">ID: ${datum.ID}</div>
-            <div>NAME: ${datum.Name}</div>
+            <div style="margin-bottom: 10px">NAME: ${datum.Name}</div>
+            <div>DISTRICT: ${datum.District}</div>
+          </div>
           `;
   }
 
