@@ -12,7 +12,9 @@ import {
   scaleFactor,
   theme,
   sizes,
-  waterMaterial
+  waterMaterial,
+  waterColor,
+  sunColor
 } from "./constants.js";
 
 function VaultHill({
@@ -83,7 +85,7 @@ function VaultHill({
 
       const land = new THREE.Mesh(p, materials.lakes);
       land.renderOrder = 3;
-      land.position.y = worldYPosition;
+      land.position.y = worldYPosition - 0.005;
       land.rotateX(Math.PI / 2);
 
       lakes.add(land);
@@ -105,7 +107,7 @@ function VaultHill({
 
     for (let i = 0; i < data.lands.length; i++) {
       const { x1, y1, ...rest } = data.lands[i];
-      const type = rest.Name.split("_")[0];
+      const type = rest.Type;
 
       const geometry = geometries[type];
       const material = materials[type]();
@@ -135,7 +137,7 @@ function VaultHill({
 
       const land = new THREE.Mesh(p, materials.greenAreas);
 
-      land.position.y = worldYPosition;
+      land.position.y = worldYPosition - 0.01;
       land.rotateX(Math.PI / 2);
 
       greens.add(land);
@@ -146,7 +148,7 @@ function VaultHill({
 
   function createMaterials() {
     const greenLands = new THREE.MeshBasicMaterial({
-      map: new THREE.TextureLoader().load(colors.greenLandMaterial,function (texture) {
+      map: new THREE.TextureLoader().load(colors.GreenLand.value,function (texture) {
         texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
       }),
       side: THREE.BackSide,
@@ -157,9 +159,10 @@ function VaultHill({
       side: THREE.BackSide,
     });
 
+    const streetColor = colors.Streets;
+
     const streets = new THREE.MeshBasicMaterial({
-      // color: colors.Streets,
-      map: new THREE.TextureLoader().load(colors.streetMaterial, function (texture) {
+      map: new THREE.TextureLoader().load(streetColor.value, function (texture) {
         texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
       }),
       side: THREE.BackSide,
@@ -213,25 +216,43 @@ function VaultHill({
 
   function updateMaterials() {
     // green land texture
-    materials.greenLands.map = new THREE.TextureLoader().load(colors.greenLandMaterial,function (texture) {
-      texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-      materials.greenLands.map.needsUpdate = true;
-    });
+    const greenLandColor = colors.GreenLand;
+
+    if (greenLandColor.type === "texture") {
+      materials.greenLands.color.setHex(0xffffff);
+      materials.greenLands.map = new THREE.TextureLoader().load(greenLandColor.value, function (texture) {
+        texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+        materials.greenLands.needsUpdate = true;
+      });
+    } else {
+      materials.greenLands.color.setHex(greenLandColor.value);
+      materials.greenLands.map = null; // not sure
+      materials.greenLands.needsUpdate = true;
+    }
     
     // green areas
     materials.greenAreas.color.setHex(colors.Green);
 
     // streets
-    materials.streets.map = new THREE.TextureLoader().load(colors.streetMaterial, function (texture) {
-      texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-      materials.streets.map.needsUpdate = true;
-    })
+    const streetColor = colors.Streets;
+
+    if (streetColor.type === "texture") {
+      materials.streets.color.setHex(0xffffff);
+      materials.streets.map = new THREE.TextureLoader().load(streetColor.value, function (texture) {
+        texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+        materials.streets.needsUpdate = true;
+      });
+    } else {
+      materials.streets.color.setHex(streetColor.value);
+      materials.streets.map = null; // not sure
+      materials.streets.needsUpdate = true;
+    }
 
     // matLine
     materials.matLine.color.setHex(colors.Bridges);
 
     // lakes
-    materials.lakes.color.setHex(colors.lakes);
+    materials.lakes.color.setHex(colors.Lake);
   }
 
   function createLine(pos) {
@@ -291,8 +312,8 @@ function VaultHill({
         }
       ),
       sunDirection: new THREE.Vector3(),
-      sunColor: 0xffffff,
-      waterColor: 0x003C5F,
+      sunColor: sunColor,
+      waterColor: waterColor,
       distortionScale: 3.7,
       fog: scene.fog !== undefined,
     });
@@ -314,7 +335,7 @@ function VaultHill({
     skyUniforms["mieDirectionalG"].value = 0.8;
 
     const parameters = {
-      elevation: 1.5,
+      elevation: 3.5,
       azimuth: 160,
     };
 
@@ -503,7 +524,9 @@ function VaultHill({
 
     t.innerHTML = `
             <div style="margin-bottom: 10px">ID: ${datum.ID}</div>
-            <div>NAME: ${datum.Name}</div>
+            <div style="margin-bottom: 10px">NAME: ${datum.Name}</div>
+            <div>DISTRICT: ${datum.District}</div>
+          </div>
           `;
   }
 

@@ -6,19 +6,40 @@ const scaleFactor = 1000;
 let sidebarShown = false, vaultHill, threeD = false, day = true;
 
 d3.select('#toggler').on('click', toggleSidebar);
-// d3.select('#texture_selector').on('change', changeTexture)
 d3.select('#day_night_toggle').on('click', toggleDayNight)
-// d3.select('#threeDBtn').on('click', toggleThreeD);
 
 Promise.all([
-  d3.csv("./data/data.csv", d3.autoType),
+  d3.csv("./data/VHC_allLands.csv"),
   d3.dsv(";", "./data/VHC_MAPandGreens.csv"),
   d3.dsv(";", "./data/VHC_MAPandstreets.csv"),
   d3.dsv(";", "./data/VHC_MAPandHills.csv"),
   d3.dsv(";", "./data/VHC_MAPandCommonSpaces.csv"),
   d3.csv("./data/VHC_MAPandDiagonalsParallels.csv"),
   d3.dsv(";", "./data/VHC_MAPandLakes.csv"),
-]).then(([data, greens, streets, hills, commonSpaces, bridges, lakes]) => {
+]).then(([all_lands, greens, streets, hills, commonSpaces, bridges, lakes]) => {
+  const data = all_lands.map(d => {
+    const [xy1_x, xy1_y] = d._1_XY.split(", ").map(d => +d);
+    const [xy2_x, xy2_y] = d._2_XY.split(", ").map(d => +d);
+    const [xy3_x, xy3_y] = d._3_XY.split(", ").map(d => +d);
+    const [xy4_x, xy4_y] = d._4_XY.split(", ").map(d => +d);
+  
+    const x1 = Math.min(xy1_x, xy2_x, xy3_x, xy4_x);
+    const y1 = Math.min(xy1_y, xy2_y, xy3_y, xy4_y);
+
+    // columns that you want to keep
+    const keys = [
+      'Type',
+      'District',
+      'ID',
+    ];
+
+    const obj = { x1, y1, Name: d.Type, };
+
+    keys.forEach(k => obj[k] = d[k]);
+
+    return obj;
+  });
+
   const greenData = processCoords(greens);
   const streetsData = processCoords(streets);
   const lakesData = processCoords(lakes);
@@ -78,11 +99,15 @@ Promise.all([
             <div>${land.ID}</div>
           </div>
           <div>
-            <label>
-              NAME:
-            </label>
+            <label>NAME:</label>
             <div>
               ${land.Name}
+            </div>
+          </div>
+          <div>
+            <label>DISTRICT:</label>
+            <div>
+              ${land.District}
             </div>
           </div>
         `)
@@ -135,10 +160,3 @@ function toggleSidebar() {
   const t = document.querySelector('#toggler');
   t.setAttribute('class', 'sidebar__close' + (sidebarShown ? '' : ' sidebar__hidden'));
 }
-
-// function toggleThreeD() {
-//   threeD = !threeD;
-
-//   d3.select(this).html(threeD ? '2D' : '3D');
-//   // vaultHill.updateCamera(threeD);
-// }
