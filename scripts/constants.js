@@ -27,7 +27,7 @@ export const theme = {
   },
   dark: {
     Water: 0x122230,
-    Green: 0x00ff00,
+    Green: 0x041922,
 
     Streets: {
       type: 'color',
