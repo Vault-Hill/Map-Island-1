@@ -19,10 +19,10 @@ export const theme = {
 
     Lake: 0x122230,
     Bridges: 0xffffff,
-    Exclusive: 0xc1e5e6,
-    Deluxe: 0x75bac1,
-    Premium: 0x4aa6af,
-    Standard: 0x00929c,
+    Exclusive: 0xFF7676,
+    Deluxe: 0xF20000,
+    Premium: 0x910000,
+    Standard: 0x3F0A0A,
     Highlight: 0xd91e18,
   },
   dark: {
@@ -36,27 +36,27 @@ export const theme = {
 
     GreenLand: {
       type: 'color',
-      value: 0x00ff00,
+      value: 0x041922,
     },
 
     Lake: 0x122230,
     Ground: 0x0a0f1d,
 
-    Bridges: 0xffffff,
+    Bridges: 0x041922,
 
-    Exclusive: 0xc1e5e6,
-    Deluxe: 0x75bac1,
-    Premium: 0x4aa6af,
-    Standard: 0x00929c,
-    Highlight: 0xd91e18,
+    Exclusive: 0xFF7676,
+    Deluxe: 0xF20000,
+    Premium: 0x910000,
+    Standard: 0x3F0A0A,
+    Highlight: 0xFFFFFF,
   },
 }
 
 export const sizes = {
-  Exclusive: 48 / scaleFactor,
-  Deluxe: 32 / scaleFactor,
-  Premium: 16 / scaleFactor,
-  Standard: 8 / scaleFactor,
+  Exclusive: 96 / scaleFactor,
+  Deluxe: 64 / scaleFactor,
+  Premium: 48 / scaleFactor,
+  Standard: 32 / scaleFactor,
 };
 
 export const waterColor = 0x259CC8;
