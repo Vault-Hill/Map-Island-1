@@ -44,9 +44,9 @@ export const theme = {
 
     Bridges: 0x041922,
 
-    Exclusive: 0xFF7676,
-    Deluxe: 0xF20000,
-    Premium: 0x910000,
+    Exclusive: 0xfdffcc,
+    Deluxe: 0x7dcdbb,
+    Premium: 0x347cb8,
     Standard: 0x3F0A0A,
     Highlight: 0xFFFFFF,
   },
