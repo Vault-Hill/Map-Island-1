@@ -31,6 +31,7 @@ Promise.all([
       'DISTRICT',
       'VLAND ID',
       'VLAND',
+      'COORDINATES',
     ];
 
     const obj = { x1, y1, Type: d['VLAND TYPOLOGY'], };
