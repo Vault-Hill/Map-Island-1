@@ -19,10 +19,25 @@ body {
   position: absolute;
   top: 0px;
   left: -350px;
-  background-color: #5E738B;
+  background-color: rgb(41, 50, 60);
   color: #fff;
   padding: 15px;
   border-radius: 5px;
+  min-width: 230px;
+}
+
+.tooltip-row {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  padding: 4px 0px;
+}
+
+.sidebar-content-row {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  padding: 4px 0px;
 }
 
 .sidebar {
@@ -81,7 +96,6 @@ select {
 }
 
 label {
-  margin-bottom: 8px;
   display: inline-block;
   color: #5E738B;
 }

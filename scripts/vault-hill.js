@@ -21,6 +21,7 @@ function VaultHill({
   data = {},
   container = "#scene",
   onLandClick = () => {},
+  landTooltipHTML = () => {},
   material = "dark"
 }) {
   var scene,
@@ -522,12 +523,7 @@ function VaultHill({
     t.style.left = tooltip.x + 5 + "px";
     t.style.top = tooltip.y + 5 + "px";
 
-    t.innerHTML = `
-            <div style="margin-bottom: 10px">ID: ${datum.ID}</div>
-            <div style="margin-bottom: 10px">NAME: ${datum.Name}</div>
-            <div>DISTRICT: ${datum.District}</div>
-          </div>
-          `;
+    t.innerHTML = landTooltipHTML(datum);
   }
 
   function hideTooltip() {

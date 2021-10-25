@@ -9,7 +9,7 @@ d3.select('#toggler').on('click', toggleSidebar);
 d3.select('#day_night_toggle').on('click', toggleDayNight)
 
 Promise.all([
-  d3.csv("./data/VHC_allLands.csv"),
+  d3.dsv(";", "./data/VHC_VLANDS_IDandCoordinates.csv"),
   d3.dsv(";", "./data/VHC_MAPandGreens.csv"),
   d3.dsv(";", "./data/VHC_MAPandstreets.csv"),
   d3.dsv(";", "./data/VHC_MAPandHills.csv"),
@@ -28,12 +28,12 @@ Promise.all([
 
     // columns that you want to keep
     const keys = [
-      'Type',
-      'District',
-      'ID',
+      'DISTRICT',
+      'VLAND ID',
+      'VLAND',
     ];
 
-    const obj = { x1, y1, Name: d.Type, };
+    const obj = { x1, y1, Type: d['VLAND TYPOLOGY'], };
 
     keys.forEach(k => obj[k] = d[k]);
 
@@ -92,31 +92,45 @@ Promise.all([
     onLandClick: (land) => {
       const el = d3.select('#land_info');
 
+      const fieldsNotShown = [];
+      let html = '';
+
       if (land) {
-        el.html(`
-          <div style="margin-bottom: 10px">
-            <label>ID:</label> 
-            <div>${land.ID}</div>
-          </div>
-          <div>
-            <label>NAME:</label>
-            <div>
-              ${land.Name}
+        Object.keys(land).filter(k => {
+          return fieldsNotShown.indexOf(k) === -1;
+        }).forEach(k => {
+          html += `
+            <div class="sidebar-content-row">
+              <label>${k}:</label> 
+              <div>${land[k]}</div>
             </div>
-          </div>
-          <div>
-            <label>DISTRICT:</label>
-            <div>
-              ${land.District}
-            </div>
-          </div>
-        `)
+          `
+        });
+
+        el.html(html);
         if (!sidebarShown) {
           toggleSidebar();
         }
       } else {
         el.html('');
       }
+    },
+    landTooltipHTML: (land) => {
+      const fieldsNotShown = [];
+      let html = '';
+
+      Object.keys(land).filter(k => {
+        return fieldsNotShown.indexOf(k) === -1;
+      }).forEach(k => {
+        html += `
+          <div class="tooltip-row">
+            <label>${k}:</label> 
+            <div>${land[k]}</div>
+          </div>
+        `
+      });
+      
+      return html;
     }
   });
 });
