@@ -18,7 +18,7 @@ export const theme = {
     },
 
     Lake: 0x122230,
-    Bridges: 0x503a78,
+    Bridges: 0x9163ff,
     Exclusive: 0x7166ff,
     Deluxe: 0xb063ff,
     Premium: 0x7066ff,
@@ -26,23 +26,23 @@ export const theme = {
     Highlight: 0xd91e18,
   },
   dark: {
-    Water: 0x1b234c,
-    Green: 0x29295c,
+    Water: 0x122230,
+    Green: 0x041922,
 
     Streets: {
       type: 'color',
-      value: 0x37275a,
+      value: 0x2d344a,
     },
 
     GreenLand: {
       type: 'color',
-      value: 0x1b244d,
+      value: 0x041922,
     },
 
-    Lake: 0x1b244d,
-    Ground: 0x3b295c,
+    Lake: 0x122230,
+    Ground: 0x47255a,
 
-    Bridges: 0x37285c,
+    Bridges: 0x243546,
 
     Exclusive: 0xfdffcc,
     Deluxe: 0x7dcdbb,
