@@ -26,7 +26,7 @@ export const theme = {
     Highlight: 0xd91e18,
   },
   dark: {
-    Water: 0x122230,
+    Water: 0x3d285c,
     Green: 0x041922,
 
     Streets: {
