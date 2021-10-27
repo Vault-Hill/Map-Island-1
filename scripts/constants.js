@@ -18,7 +18,7 @@ export const theme = {
     },
 
     Lake: 0x122230,
-    Bridges: 0xffffff,
+    Bridges: 0x503a78,
     Exclusive: 0xFF7676,
     Deluxe: 0xF20000,
     Premium: 0x910000,
@@ -26,8 +26,8 @@ export const theme = {
     Highlight: 0xd91e18,
   },
   dark: {
-    Water: 0x3d285c,
-    Green: 0x041922,
+    Water: 0x122230,
+    Green: 0x37275a,
 
     Streets: {
       type: 'color',
@@ -40,7 +40,7 @@ export const theme = {
     },
 
     Lake: 0x122230,
-    Ground: 0x0a0f1d,
+    Ground: 0x3b295c,
 
     Bridges: 0x041922,
 
