@@ -19,7 +19,7 @@ export const theme = {
     },
 
     Lake: 0x5a7c99,
-    Bridges: 0x22384a,
+    Bridges: 0x2d344a,
     Exclusive: 0xc1e5e6,
     Deluxe: 0x75bac1,
     Premium: 0x4aa6af,

@@ -336,7 +336,7 @@ function VaultHill({
     skyUniforms["mieDirectionalG"].value = 0.8;
 
     const parameters = {
-      elevation: 3.5,
+      elevation: 15,
       azimuth: 160,
     };
 
