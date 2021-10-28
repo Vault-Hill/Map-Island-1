@@ -15,14 +15,15 @@ export const theme = {
     GreenLand: {
       type: 'texture',
       value: 'images/textures/grass.jpeg',
+
     },
 
-    Lake: 0x122230,
-    Bridges: 0x9163ff,
-    Exclusive: 0x7166ff,
-    Deluxe: 0xb063ff,
-    Premium: 0x7066ff,
-    Standard: 0x503777,
+    Lake: 0x5a7c99,
+    Bridges: 0x22384a,
+    Exclusive: 0xc1e5e6,
+    Deluxe: 0x75bac1,
+    Premium: 0x4aa6af,
+    Standard: 0x00929c,
     Highlight: 0xd91e18,
   },
   dark: {
@@ -48,7 +49,7 @@ export const theme = {
     Deluxe: 0x7dcdbb,
     Premium: 0x347cb8,
     Standard: 0x503777,
-    Highlight: 0xFFFFFF,
+    Highlight: 0xd91e18,
   },
 }
 
