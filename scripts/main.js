@@ -31,6 +31,7 @@ Promise.all([
       'DISTRICT',
       'VLAND ID',
       'COORDINATES',
+      'CLUSTER',
       'HUMAN INSTINCT',
     ];
 
