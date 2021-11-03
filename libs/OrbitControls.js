@@ -19,6 +19,9 @@ const _changeEvent = { type: 'change' };
 const _startEvent = { type: 'start' };
 const _endEvent = { type: 'end' };
 
+var minPan = new THREE.Vector3( - 2, - 2, - 2 );
+var maxPan = new THREE.Vector3( 2, 2, 2 );
+
 class OrbitControls extends EventDispatcher {
 
 	constructor( object, domElement ) {
@@ -241,6 +244,8 @@ class OrbitControls extends EventDispatcher {
 					scope.target.add( panOffset );
 
 				}
+
+				scope.target.clamp( minPan, maxPan );
 
 				offset.setFromSpherical( spherical );
 
