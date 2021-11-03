@@ -5,7 +5,7 @@ const scaleFactor = 1000;
 
 let sidebarShown = false, vaultHill, threeD = false, day = true;
 
-d3.select('#toggler').on('click', toggleSidebar);
+// #sidebartoggler').on('click', toggleSidebar);
 d3.select('#day_night_toggle').on('click', toggleDayNight)
 
 Promise.all([
@@ -91,30 +91,31 @@ Promise.all([
     container: "#scene",
     material: 'ocean',
     onLandClick: (land) => {
-      const el = d3.select('#land_info');
+      console.log("land was clicked", land);
+      // const el = d3.select('#land_info');
 
-      const fieldsNotShown = [];
-      let html = '';
+      // const fieldsNotShown = [];
+      // let html = '';
 
-      if (land) {
-        Object.keys(land).filter(k => {
-          return fieldsNotShown.indexOf(k) === -1;
-        }).forEach(k => {
-          html += `
-            <div class="sidebar-content-row">
-              <label>${k}:</label> 
-              <div>${land[k]}</div>
-            </div>
-          `
-        });
+      // if (land) {
+      //   Object.keys(land).filter(k => {
+      //     return fieldsNotShown.indexOf(k) === -1;
+      //   }).forEach(k => {
+      //     html += `
+      //       <div class="sidebar-content-row">
+      //         <label>${k}:</label> 
+      //         <div>${land[k]}</div>
+      //       </div>
+      //     `
+      //   });
 
-        el.html(html);
-        if (!sidebarShown) {
-          toggleSidebar();
-        }
-      } else {
-        el.html('');
-      }
+      //   el.html(html);
+      //   if (!sidebarShown) {
+      //     toggleSidebar();
+      //   }
+      // } else {
+      //   el.html('');
+      // }
     },
     landTooltipHTML: (land) => {
       const fieldsNotShown = [];
@@ -166,12 +167,12 @@ function processCoords(greens, index = 2) {
   });
 }
 
-function toggleSidebar() {
-  sidebarShown = !sidebarShown;
+// function toggleSidebar() {
+//   sidebarShown = !sidebarShown;
   
-  const s = document.querySelector('#sidebar');
-  s.setAttribute('class', 'sidebar' + (sidebarShown ? '' : ' sidebar__hidden'));
+//   const s = document.querySelector('#sidebar');
+//   s.setAttribute('class', 'sidebar' + (sidebarShown ? '' : ' sidebar__hidden'));
 
-  const t = document.querySelector('#toggler');
-  t.setAttribute('class', 'sidebar__close' + (sidebarShown ? '' : ' sidebar__hidden'));
-}
+//   const t = document.querySelector('#toggler');
+//   t.setAttribute('class', 'sidebar__close' + (sidebarShown ? '' : ' sidebar__hidden'));
+// }
