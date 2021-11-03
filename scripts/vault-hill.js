@@ -371,6 +371,7 @@ function VaultHill({
 
     controls.screenSpacePanning = false;
 
+    // constrain zoom
     controls.minDistance = 1;
     controls.maxDistance = 20;
 

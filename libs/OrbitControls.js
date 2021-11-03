@@ -19,8 +19,8 @@ const _changeEvent = { type: 'change' };
 const _startEvent = { type: 'start' };
 const _endEvent = { type: 'end' };
 
-var minPan = new THREE.Vector3( - 2, - 2, - 2 );
-var maxPan = new THREE.Vector3( 2, 2, 2 );
+var minPan = new Vector3( -5, -5, -5);
+var maxPan = new Vector3( 5, 5, 5 );
 
 class OrbitControls extends EventDispatcher {
 
