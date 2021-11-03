@@ -1,4 +1,4 @@
-Count;DISTRICT;HUMAN INSTINCT;TYPE OF LAND;VLAND ID;COORDINATES;xy1_x;xy2_x;y3_x;xy4_x;Position X;Position Y;Cluster
+Count;DISTRICT;HUMAN INSTINCT;TYPE OF LAND;VLAND ID;COORDINATES;xy1_x;xy2_x;xy3_x;xy4_x;Position X;Position Y;Cluster
 1;District 1 Alpha;Curiosity;Deluxe;0989D;"1136, 16";"1120, 32";"1120, 0";"1152, 0";"1152, 32";1136.0000;16.0000;18
 2;District 1 Alpha;Curiosity;Deluxe;0990D;"1136, -16";"1120, 0";"1120, -32";"1152, -32";"1152, 0";1136.0000;-16.0000;18
 3;District 1 Alpha;Curiosity;Deluxe;0991D;"1104, 16";"1088, 32";"1088, 0";"1120, 0";"1120, 32";1104.0000;16.0000;18
