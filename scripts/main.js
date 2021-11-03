@@ -9,7 +9,7 @@ let sidebarShown = false, vaultHill, threeD = false, day = true;
 d3.select('#day_night_toggle').on('click', toggleDayNight)
 
 Promise.all([
-  d3.dsv(",", "./data/VHC_VLANDS_IDandCoordinates.csv"),
+  d3.dsv(";", "./data/VHC_VLANDS_IDandCoordinates.csv"),
   d3.dsv(";", "./data/VHC_MAPandGreens.csv"),
   d3.dsv(";", "./data/VHC_MAPandstreets.csv"),
   d3.dsv(";", "./data/VHC_MAPandHills.csv"),
@@ -31,7 +31,6 @@ Promise.all([
       'DISTRICT',
       'VLAND ID',
       'COORDINATES',
-      'Cluster',
       'HUMAN INSTINCT',
     ];
 
