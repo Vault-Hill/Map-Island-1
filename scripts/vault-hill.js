@@ -336,7 +336,7 @@ function VaultHill({
     skyUniforms["mieDirectionalG"].value = 0.8;
 
     const parameters = {
-      elevation: 15,
+      elevation: 3.5,
       azimuth: 160,
     };
 
@@ -371,9 +371,8 @@ function VaultHill({
 
     controls.screenSpacePanning = false;
 
-    // constrain zoom
     controls.minDistance = 1;
-    controls.maxDistance = 20;
+    controls.maxDistance = 15;
 
     controls.maxPolarAngle = Math.PI / 2.5;
   }
