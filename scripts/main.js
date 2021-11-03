@@ -30,11 +30,12 @@ Promise.all([
     const keys = [
       'DISTRICT',
       'VLAND ID',
-      'VLAND',
       'COORDINATES',
+      'Cluster',
+      'HUMAN INSTINCT',
     ];
 
-    const obj = { x1, y1, Type: d['VLAND TYPOLOGY'], };
+    const obj = { x1, y1, Type: d['TYPE OF LAND'], };
 
     keys.forEach(k => obj[k] = d[k]);
 
