@@ -29,9 +29,9 @@ Promise.all([
     // columns that you want to keep
     const keys = [
       'DISTRICT',
+      'HUMAN INSTINCT',
       'VLAND ID',
       'COORDINATES',
-      'HUMAN INSTINCT',
     ];
 
     const obj = { x1, y1, Type: d['TYPE OF LAND'], };
@@ -118,20 +118,19 @@ Promise.all([
       // }
     },
     landTooltipHTML: (land) => {
-      const fieldsNotShown = [];
-      let html = '';
-
+      const fieldsNotShown = ['DISTRICT'];
+      let html = `<div class="tooltip-header">${land.DISTRICT}</div>`;
+      
       Object.keys(land).filter(k => {
         return fieldsNotShown.indexOf(k) === -1;
       }).forEach(k => {
         html += `
           <div class="tooltip-row">
-            <label>${k}:</label> 
-            <div>${land[k]}</div>
+            <label>${k}</label> 
+            <div class="tooltip-row_value">${land[k]}</div>
           </div>
         `
-      });
-      
+      });      
       return html;
     }
   });
