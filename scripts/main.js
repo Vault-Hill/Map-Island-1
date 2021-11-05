@@ -89,7 +89,7 @@ Promise.all([
       lakes: lakesData,
     },
     container: "#scene",
-    material: 'ocean',
+    material: 'dark',
     onLandClick: (land) => {
       console.log("land was clicked", land);
       // const el = d3.select('#land_info');
